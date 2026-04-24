@@ -1,9 +1,5 @@
 {
   "name": "cyama-ai",
   "version": "1.0.0",
-  "description": "cYama AI - Asisten Cerdas dengan 3 AI (GPT4, CAI, Kimi)",
-  "type": "module",
-  "scripts": {
-    "dev": "node api/chat.js"
-  }
+  "type": "module"
 }
