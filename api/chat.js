@@ -4,146 +4,115 @@ export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
     
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
-    }
-    
+    if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'POST') {
         return res.status(405).json({ 
-            success: false,
-            error: 'Method tidak diizinkan'
+            success: false, 
+            error: 'Method tidak diizinkan' 
         });
     }
     
     const { message } = req.body;
-    
     if (!message || message.trim() === '') {
-        return res.status(400).json({
-            success: false,
-            error: 'Pesan tidak boleh kosong'
+        return res.status(400).json({ 
+            success: false, 
+            error: 'Pesan tidak boleh kosong' 
         });
     }
     
-    // Ambil IP user
-    const getClientIp = (req) => {
-        const ip = req.headers['x-forwarded-for'] || 
-                   req.headers['x-real-ip'] ||
-                   req.headers['cf-connecting-ip'] ||
-                   req.connection?.remoteAddress ||
-                   req.socket?.remoteAddress ||
-                   '';
-        return ip.split(',')[0].trim() || '0.0.0.0';
-    };
+    const API_KEY = 'a7k3m9x2p4';
+    const userIp = req.headers['x-forwarded-for']?.split(',')[0] || req.socket?.remoteAddress || 'unknown';
     
-    const clientIp = getClientIp(req);
-    const API_KEY = process.env.NEOXR_API_KEY || 'a7k3m9x2p4';
-    const API_URL = 'https://api.neoxr.eu/api/blackbox';
+    // 3 API dengan urutan prioritas tetap (bukan random)
+    const apis = [
+        {
+            name: 'GPT4',
+            url: `https://api.neoxr.eu/api/gpt4?q=${encodeURIComponent(message)}&apikey=${API_KEY}`,
+            extract: (data) => data.result || data.data || data.message || data.response
+        },
+        {
+            name: 'Character AI',
+            url: `https://api.neoxr.eu/api/cai?character_id=333e7322-a95b-4a14-a051-1c24b8d67b31&message=${encodeURIComponent(message)}&apikey=${API_KEY}`,
+            extract: (data) => data.result || data.data || data.message || data.response
+        },
+        {
+            name: 'Kimi AI',
+            url: `https://api.neoxr.eu/api/kimi?prompt=${encodeURIComponent(message)}&model=moonshotai%2FKimi-K2-Instruct-0905&session=5e6b8c36-ab3a-408b-b768-c53939b822ac&apikey=${API_KEY}`,
+            extract: (data) => data.result || data.data || data.message || data.response || data.content
+        }
+    ];
     
-    console.log(`[cYama] IP: ${clientIp}, Pesan: ${message.substring(0, 30)}`);
-    
-    try {
-        // Panggil API Neoxr
-        const response = await fetch(`${API_URL}?q=${encodeURIComponent(message)}&apikey=${API_KEY}`);
-        const rawText = await response.text();
-        
-        console.log(`[cYama] Raw Response: ${rawText.substring(0, 200)}`);
-        
-        let data;
+    // Coba API satu per satu (fallback system)
+    for (const api of apis) {
         try {
-            data = JSON.parse(rawText);
-        } catch (e) {
-            return res.status(500).json({
-                success: false,
-                error: 'Response API tidak valid',
-                detail: rawText.substring(0, 100),
-                solution: 'API sedang bermasalah, coba lagi nanti'
+            console.log(`[cYama] Mencoba ${api.name}...`);
+            
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 30000);
+            
+            const response = await fetch(api.url, {
+                signal: controller.signal,
+                headers: { 'User-Agent': 'cYama-AI/1.0', 'Accept': 'application/json' }
             });
+            
+            clearTimeout(timeoutId);
+            
+            const rawText = await response.text();
+            let data;
+            
+            try {
+                data = JSON.parse(rawText);
+            } catch(e) {
+                return res.status(200).json({
+                    success: true,
+                    reply: rawText.substring(0, 2000),
+                    api_used: api.name
+                });
+            }
+            
+            // Jika API mengembalikan error
+            if (data.status === false) {
+                const errorMsg = data.msg || '';
+                
+                // Deteksi error IP tidak terdaftar
+                if (errorMsg.toLowerCase().includes('ip not allowed')) {
+                    return res.status(403).json({
+                        success: false,
+                        error: errorMsg,
+                        api_name: api.name,
+                        server_ip: data.ip || 'tidak diketahui',
+                        your_ip: userIp,
+                        dashboard_url: 'https://api.neoxr.my.id/dashboard',
+                        need_whitelist: true
+                    });
+                }
+                
+                // Error lain, lanjut ke API berikutnya
+                console.log(`[cYama] ${api.name} error: ${errorMsg}`);
+                continue;
+            }
+            
+            // Ekstrak reply jika sukses
+            let reply = api.extract(data);
+            if (reply && typeof reply === 'string' && reply.trim()) {
+                return res.status(200).json({
+                    success: true,
+                    reply: reply,
+                    api_used: api.name
+                });
+            }
+            
+        } catch (error) {
+            console.log(`[cYama] ${api.name} fetch error: ${error.message}`);
+            continue;
         }
-        
-        // ========== CEK STATUS RESPONSE DARI API ==========
-        // Contoh response Neoxr:
-        // { "status": false, "msg": "parameter \"apikey\" is required" }
-        // { "status": true, "result": "jawaban..." }
-        
-        if (data.status === false) {
-            const errorMsg = data.msg || 'Unknown error';
-            
-            console.log(`[cYama] API Error: ${errorMsg}`);
-            
-            // DETEKSI JENIS ERROR BERDASARKAN PESANNYA
-            let errorTitle = 'API Error';
-            let detailError = errorMsg;
-            let solusi = 'Coba lagi nanti';
-            let needWhitelist = false;
-            
-            // Case 1: API Key salah atau tidak ada
-            if (errorMsg.toLowerCase().includes('apikey')) {
-                errorTitle = 'API Key Tidak Valid';
-                detailError = 'API Key yang digunakan tidak dikenali oleh server';
-                solusi = 'Periksa kembali API Key di environment variable Vercel';
-            }
-            // Case 2: IP tidak terdaftar (harusnya error msg mengandung kata IP)
-            else if (errorMsg.toLowerCase().includes('ip') || 
-                     errorMsg.toLowerCase().includes('whitelist') ||
-                     errorMsg.toLowerCase().includes('access denied')) {
-                errorTitle = '⚠️ IP Belum Dikonfirmasi';
-                detailError = `IP ${clientIp} belum terdaftar di whitelist API Neoxr`;
-                solusi = 'Hubungi owner cYama AI untuk konfirmasi IP';
-                needWhitelist = true;
-            }
-            // Case 3: Rate limit / quota habis
-            else if (errorMsg.toLowerCase().includes('limit') || 
-                     errorMsg.toLowerCase().includes('quota')) {
-                errorTitle = 'Kuota Habis';
-                detailError = errorMsg;
-                solusi = 'Kuota API sudah habis, hubungi owner untuk upgrade';
-            }
-            // Case 4: Parameter salah
-            else if (errorMsg.toLowerCase().includes('parameter')) {
-                errorTitle = 'Parameter Error';
-                detailError = errorMsg;
-                solusi = 'Parameter query yang dikirim mungkin salah format';
-            }
-            // Case 5: Error lain
-            else {
-                errorTitle = 'API Neoxr Error';
-                detailError = errorMsg;
-                solusi = 'Coba beberapa saat lagi, atau hubungi @neoxr.js';
-            }
-            
-            return res.status(400).json({
-                success: false,
-                error: errorTitle,
-                detail: detailError,
-                solution: solusi,
-                user_ip: clientIp,
-                need_whitelist: needWhitelist,
-                raw_error: errorMsg  // Kirim error asli untuk debugging
-            });
-        }
-        
-        // ========== SUKSES ==========
-        // Ekstrak reply dari berbagai kemungkinan
-        let reply = data.result || data.data || data.message || data.response || data.reply || data.content;
-        
-        if (!reply) {
-            reply = 'Maaf, saya tidak bisa memproses permintaan Anda.';
-        }
-        
-        return res.status(200).json({
-            success: true,
-            reply: reply,
-            timestamp: new Date().toISOString()
-        });
-        
-    } catch (error) {
-        console.error('[cYama] Fatal Error:', error);
-        
-        return res.status(500).json({
-            success: false,
-            error: 'Kesalahan Server',
-            detail: error.message,
-            solution: 'Refresh halaman atau coba lagi nanti'
-        });
     }
+    
+    // Jika semua API gagal
+    return res.status(500).json({
+        success: false,
+        error: 'Semua API tidak merespon',
+        detail: 'GPT4, Character AI, dan Kimi AI gagal diproses',
+        solution: 'Coba lagi nanti atau periksa koneksi internet'
+    });
 }
