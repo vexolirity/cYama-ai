@@ -2,9 +2,9 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>cYama AI - Asisten Cerdas Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cYama AI - Asisten Cerdas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         * {
@@ -18,35 +18,9 @@
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             height: 100vh;
             overflow: hidden;
-            position: relative;
-        }
-
-        /* Animasi partikel */
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            animation: float 20s infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-100px) rotate(180deg); }
         }
 
         .container {
-            position: relative;
-            z-index: 1;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -56,30 +30,22 @@
 
         .chat-wrapper {
             width: 100%;
-            max-width: 1300px;
+            max-width: 1200px;
             height: 90vh;
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
             border-radius: 40px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: all 0.3s ease;
         }
 
-        /* Header */
         .chat-header {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.9), rgba(79, 70, 229, 0.9));
             padding: 20px 30px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .header-content {
             display: flex;
             align-items: center;
             gap: 15px;
-            flex-wrap: wrap;
         }
 
         .logo {
@@ -91,21 +57,17 @@
             align-items: center;
             justify-content: center;
             font-size: 28px;
-            font-weight: bold;
             color: #4c1d95;
         }
 
         .title h1 {
             color: white;
             font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
         }
 
         .title p {
             color: rgba(255, 255, 255, 0.8);
             font-size: 14px;
-            margin-top: 5px;
         }
 
         .status {
@@ -131,42 +93,15 @@
             50% { opacity: 0.5; }
         }
 
-        /* IP Info Bar */
-        .ip-info-bar {
+        .ip-bar {
             background: rgba(0, 0, 0, 0.4);
             padding: 8px 20px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
             font-size: 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .ip-display {
             color: rgba(255, 255, 255, 0.6);
-            font-family: monospace;
         }
 
-        .ip-display i {
-            margin-right: 5px;
-        }
-
-        .check-ip-btn {
-            background: rgba(139, 92, 246, 0.3);
-            border: none;
-            padding: 5px 12px;
-            border-radius: 15px;
-            color: white;
-            cursor: pointer;
-            font-size: 11px;
-            transition: all 0.3s ease;
-        }
-
-        .check-ip-btn:hover {
-            background: rgba(139, 92, 246, 0.6);
-        }
-
-        /* Chat Area */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
@@ -176,21 +111,6 @@
             gap: 20px;
         }
 
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-        }
-
-        /* Message Bubbles */
         .message {
             display: flex;
             gap: 15px;
@@ -256,7 +176,6 @@
             background: rgba(255, 255, 255, 0.1);
             color: white;
             border-bottom-left-radius: 5px;
-            backdrop-filter: blur(10px);
         }
 
         .message-time {
@@ -266,22 +185,17 @@
             padding: 0 10px;
         }
 
-        /* Error Message */
         .error-message {
             background: rgba(239, 68, 68, 0.15);
             border-left: 4px solid #ef4444;
             padding: 15px;
             border-radius: 10px;
-            margin: 10px 0;
         }
 
         .error-title {
             color: #fca5a5;
             font-weight: 600;
             margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
         }
 
         .error-detail {
@@ -295,7 +209,6 @@
             color: #bbf7d0;
             font-size: 13px;
             padding-left: 25px;
-            white-space: pre-line;
         }
 
         .ip-block {
@@ -311,40 +224,22 @@
             gap: 10px;
             margin-top: 15px;
             justify-content: center;
-            flex-wrap: wrap;
         }
 
         .contact-btn {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 8px 16px;
+            border-radius: 20px;
             text-decoration: none;
             color: white;
-            font-weight: 500;
-            font-size: 14px;
-            transition: all 0.3s ease;
+            font-size: 13px;
         }
 
-        .contact-btn.whatsapp {
-            background: linear-gradient(135deg, #25D366, #128C7E);
-        }
+        .contact-btn.whatsapp { background: #25D366; }
+        .contact-btn.telegram { background: #0088cc; }
 
-        .contact-btn.telegram {
-            background: linear-gradient(135deg, #0088cc, #004c6e);
-        }
-
-        .contact-btn.email {
-            background: linear-gradient(135deg, #ea4335, #c5221f);
-        }
-
-        .contact-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        /* Input Area */
         .chat-input-area {
             padding: 20px 30px;
             background: rgba(0, 0, 0, 0.3);
@@ -354,16 +249,10 @@
         .input-wrapper {
             display: flex;
             gap: 15px;
-            align-items: flex-end;
-        }
-
-        .input-container {
-            flex: 1;
-            position: relative;
         }
 
         .chat-input {
-            width: 100%;
+            flex: 1;
             padding: 15px 20px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -372,17 +261,11 @@
             font-family: 'Inter', sans-serif;
             font-size: 15px;
             resize: none;
-            transition: all 0.3s ease;
         }
 
         .chat-input:focus {
             outline: none;
             border-color: #8b5cf6;
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        .chat-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
         }
 
         .send-button {
@@ -393,15 +276,6 @@
             border-radius: 50%;
             color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .send-button:hover:not(:disabled) {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
         }
 
         .send-button:disabled {
@@ -409,7 +283,6 @@
             cursor: not-allowed;
         }
 
-        /* Typing Indicator */
         .typing-indicator {
             display: flex;
             gap: 5px;
@@ -427,131 +300,40 @@
             animation: typing 1.4s infinite;
         }
 
-        .typing-indicator span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-indicator span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes typing {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.5;
-            }
-            30% {
-                transform: translateY(-10px);
-                opacity: 1;
-            }
-        }
-
-        /* Scroll to bottom button */
-        .scroll-btn {
-            position: absolute;
-            bottom: 100px;
-            right: 30px;
-            background: rgba(139, 92, 246, 0.8);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .scroll-btn.show {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .scroll-btn:hover {
-            background: rgba(139, 92, 246, 1);
-            transform: scale(1.1);
-        }
-
-        @media (max-width: 768px) {
-            .chat-wrapper {
-                height: 95vh;
-                border-radius: 20px;
-            }
-            
-            .chat-header {
-                padding: 15px;
-            }
-            
-            .title h1 {
-                font-size: 20px;
-            }
-            
-            .title p {
-                font-size: 11px;
-            }
-            
-            .chat-messages {
-                padding: 15px;
-            }
-            
-            .message-content {
-                max-width: 85%;
-            }
-            
-            .contact-buttons {
-                flex-direction: column;
-            }
-            
-            .contact-btn {
-                justify-content: center;
-            }
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-10px); opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="particles" id="particles"></div>
     <div class="container">
         <div class="chat-wrapper">
             <div class="chat-header">
-                <div class="header-content">
-                    <div class="logo">
-                        <i class="fas fa-brain"></i>
-                    </div>
-                    <div class="title">
-                        <h1>cYama AI</h1>
-                        <p>Asisten Cerdas dengan Kecerdasan Premium</p>
-                    </div>
-                    <div class="status">
-                        <div class="status-dot"></div>
-                        <span style="color: white; font-size: 12px;">Online</span>
-                    </div>
+                <div class="logo"><i class="fas fa-brain"></i></div>
+                <div class="title">
+                    <h1>cYama AI</h1>
+                    <p>Asisten Cerdas Premium</p>
+                </div>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    <span>Online</span>
                 </div>
             </div>
             
-            <div class="ip-info-bar">
-                <div class="ip-display">
-                    <i class="fas fa-globe"></i> 
-                    <span id="userIpDisplay">Mendeteksi IP...</span>
-                </div>
-                <button class="check-ip-btn" id="checkIpBtn">
-                    <i class="fas fa-sync-alt"></i> Cek IP Saya
-                </button>
+            <div class="ip-bar">
+                <span><i class="fas fa-globe"></i> <span id="ipDisplay">Mendeteksi IP...</span></span>
+                <button id="checkIpBtn" style="background:none;border:none;color:white;cursor:pointer;">🔄 Cek IP</button>
             </div>
 
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot">
-                    <div class="message-avatar">
-                        <i class="fas fa-robot"></i>
-                    </div>
+                    <div class="message-avatar"><i class="fas fa-robot"></i></div>
                     <div class="message-content">
-                        <div class="message-bubble">
-                            Halo! Saya <strong>cYama AI</strong>, asisten cerdas Anda.<br/><br/>
-                            ✨ Ada yang bisa saya bantu?<br/>
-                            💡 Tips: Ketik <code style="background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:4px;">/ip</code> untuk cek IP Anda
-                        </div>
+                        <div class="message-bubble">Halo! Saya cYama AI. Ada yang bisa saya bantu? 😊</div>
                         <div class="message-time">Sekarang</div>
                     </div>
                 </div>
@@ -559,367 +341,180 @@
 
             <div class="chat-input-area">
                 <div class="input-wrapper">
-                    <div class="input-container">
-                        <textarea class="chat-input" id="messageInput" placeholder="Tulis pesan Anda di sini... (Enter untuk kirim, Shift+Enter untuk new line)" rows="1"></textarea>
-                    </div>
-                    <button class="send-button" id="sendButton">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                    <textarea class="chat-input" id="messageInput" placeholder="Ketik pesan... (Enter kirim)" rows="1"></textarea>
+                    <button class="send-button" id="sendButton"><i class="fas fa-paper-plane"></i></button>
                 </div>
             </div>
-        </div>
-        <div class="scroll-btn" id="scrollBtn">
-            <i class="fas fa-chevron-down"></i>
         </div>
     </div>
 
     <script>
-        // Generate particles
-        function createParticles() {
-            const particlesDiv = document.getElementById('particles');
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('particle');
-                const size = Math.random() * 5 + 2;
-                particle.style.width = `${size}px`;
-                particle.style.height = `${size}px`;
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.top = `${Math.random() * 100}%`;
-                particle.style.animationDelay = `${Math.random() * 20}s`;
-                particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
-                particlesDiv.appendChild(particle);
-            }
-        }
-        createParticles();
-
-        // DOM Elements
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const scrollBtn = document.getElementById('scrollBtn');
-        const userIpDisplay = document.getElementById('userIpDisplay');
+        const ipDisplay = document.getElementById('ipDisplay');
         
         let isTyping = false;
-        let currentUserIp = '';
+        let currentIp = '';
 
-        // Auto-resize textarea
+        // Auto resize textarea
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
 
-        // Scroll to bottom
         function scrollToBottom() {
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Show/hide scroll button
-        chatMessages.addEventListener('scroll', () => {
-            const isNearBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 100;
-            if (isNearBottom) {
-                scrollBtn.classList.remove('show');
-            } else {
-                scrollBtn.classList.add('show');
-            }
-        });
-
-        scrollBtn.addEventListener('click', () => {
-            scrollToBottom();
-        });
-
-        // Get User IP dari backend
-        async function fetchUserIp() {
+        // Ambil IP dari backend
+        async function fetchIp() {
             try {
-                const response = await fetch('/api/ip');
-                const data = await response.json();
-                currentUserIp = data.ip;
-                userIpDisplay.innerHTML = `<i class="fas fa-globe"></i> IP: ${currentUserIp}`;
-                return currentUserIp;
+                const res = await fetch('/api/ip');
+                const data = await res.json();
+                currentIp = data.ip;
+                ipDisplay.textContent = `IP: ${currentIp}`;
             } catch (error) {
-                userIpDisplay.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Gagal deteksi IP`;
-                return 'Tidak terdeteksi';
+                ipDisplay.textContent = 'IP: Gagal deteksi';
             }
         }
 
-        // Cek IP manual
-        document.getElementById('checkIpBtn').addEventListener('click', async () => {
-            const ip = await fetchUserIp();
-            addSystemMessage(`🌐 IP Address Anda: ${ip}\n\n📞 Hubungi owner @cYamaAI jika ingin whitelist IP ini.`, 'info');
-        });
+        document.getElementById('checkIpBtn').onclick = () => {
+            addSystemMessage(`🌐 IP Address Anda: ${currentIp || 'Tidak terdeteksi'}`);
+        };
 
-        // Add message to chat
         function addMessage(text, sender) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'message-bubble';
-            bubble.textContent = text;
-            
-            const time = document.createElement('div');
-            time.className = 'message-time';
-            time.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            
-            content.appendChild(bubble);
-            content.appendChild(time);
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(content);
-            
-            chatMessages.appendChild(messageDiv);
+            const div = document.createElement('div');
+            div.className = `message ${sender}`;
+            div.innerHTML = `
+                <div class="message-avatar"><i class="fas ${sender === 'user' ? 'fa-user' : 'fa-robot'}"></i></div>
+                <div class="message-content">
+                    <div class="message-bubble">${escapeHtml(text)}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' })}</div>
+                </div>
+            `;
+            chatMessages.appendChild(div);
             scrollToBottom();
         }
 
-        // Add system message (info, error, etc)
-        function addSystemMessage(text, type = 'info') {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message bot`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.innerHTML = type === 'error' ? '<i class="fas fa-exclamation-triangle"></i>' : '<i class="fas fa-info-circle"></i>';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'message-bubble';
-            bubble.style.background = type === 'error' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)';
-            bubble.style.borderLeft = type === 'error' ? '3px solid #ef4444' : '3px solid #3b82f6';
-            bubble.textContent = text;
-            
-            const time = document.createElement('div');
-            time.className = 'message-time';
-            time.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            
-            content.appendChild(bubble);
-            content.appendChild(time);
-            messageDiv.appendChild(avatar);
-            messageDiv.appendChild(content);
-            
-            chatMessages.appendChild(messageDiv);
+        function addSystemMessage(text) {
+            const div = document.createElement('div');
+            div.className = 'message bot';
+            div.innerHTML = `
+                <div class="message-avatar"><i class="fas fa-info-circle"></i></div>
+                <div class="message-content">
+                    <div class="message-bubble" style="background:rgba(59,130,246,0.2);border-left:3px solid #3b82f6;">${escapeHtml(text)}</div>
+                    <div class="message-time">${new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' })}</div>
+                </div>
+            `;
+            chatMessages.appendChild(div);
             scrollToBottom();
         }
 
-        // Add detailed error message with contact buttons
-        function addDetailedError(data) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'message bot';
+        function addError(data) {
+            const div = document.createElement('div');
+            div.className = 'message bot';
             
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+            let errorHtml = `
+                <div class="message-avatar"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="message-content">
+                    <div class="error-message">
+                        <div class="error-title">⚠️ ${escapeHtml(data.error || 'Error')}</div>
+                        <div class="error-detail"><strong>Detail:</strong> ${escapeHtml(data.detail || '')}</div>
+                        <div class="error-solution"><strong>💡 Solusi:</strong><br/>${escapeHtml(data.solution || 'Coba lagi nanti')}</div>
+            `;
             
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            
-            const errorContainer = document.createElement('div');
-            errorContainer.className = 'error-message';
-            
-            // Cek apakah error karena IP belum dikonfirmasi
-            if (data.need_whitelist || data.error?.includes('IP belum dikonfirmasi')) {
-                const userIp = data.user_ip || currentUserIp || 'Tidak terdeteksi';
-                
-                errorContainer.innerHTML = `
-                    <div class="error-title">
-                        <i class="fas fa-ban" style="color: #f87171;"></i>
-                        <span style="color: #f87171;">⚠️ ${data.error || 'IP belum dikonfirmasi'}</span>
-                    </div>
-                    <div class="ip-block">
-                        <strong><i class="fas fa-network-wired"></i> IP Address Anda:</strong><br/>
-                        <code style="background: #000; padding: 8px 12px; border-radius: 8px; display: inline-block; margin-top: 8px; font-size: 16px; font-weight: bold;">${userIp}</code>
-                    </div>
-                    <div class="error-detail">
-                        <strong>📝 Detail:</strong><br/>${data.detail || 'IP Anda belum terdaftar di whitelist API'}
-                    </div>
-                    <div class="error-solution">
-                        <strong>💡 Solusi:</strong><br/>
-                        ${data.solution || 'Hubungi owner untuk konfirmasi IP'}
-                    </div>
-                    <div class="contact-buttons">
-                        <a href="https://wa.me/6288286708193?text=Halo%20Yama,%20saya%20mau%20konfirmasi%20IP%20untuk%20cYama%20AI%0A%0ANama:%20%0AIP%20saya:%20${encodeURIComponent(userIp)}%0ATolong%20didaftarkan%20ke%20whitelist%20ya" 
-                           target="_blank" 
-                           class="contact-btn whatsapp">
-                            <i class="fab fa-whatsapp"></i> Chat Owner (Yama)
-                        </a>
-                        <a href="https://t.me/cYamaAI_bot" 
-                           target="_blank" 
-                           class="contact-btn telegram">
-                            <i class="fab fa-telegram"></i> Telegram @cYamaAI_bot
-                        </a>
-                        <a href="mailto:support@cyama.ai?subject=Whitelist%20IP%20cYama%20AI&body=Nama%3A%20%0AIP%20saya%3A%20${encodeURIComponent(userIp)}%0AMohon%20didaftarkan%20ke%20whitelist" 
-                           class="contact-btn email">
-                            <i class="fas fa-envelope"></i> Email Support
-                        </a>
-                    </div>
-                `;
-            } else {
-                // Error biasa
-                errorContainer.innerHTML = `
-                    <div class="error-title">
-                        <i class="fas fa-times-circle"></i>
-                        <span>⚠️ ${data.error || 'Terjadi Kesalahan'}</span>
-                    </div>
-                    <div class="error-detail">
-                        <strong>Detail Error:</strong> ${data.detail || 'Unknown error'}
-                    </div>
-                    ${data.user_ip ? `<div class="error-detail"><strong>IP Anda:</strong> ${data.user_ip}</div>` : ''}
-                    <div class="error-solution">
-                        <strong>💡 Solusi:</strong><br/>${data.solution || 'Coba lagi nanti atau hubungi owner'}
-                    </div>
+            // Jika error IP
+            if (data.need_whitelist || data.error?.includes('IP Belum')) {
+                errorHtml += `
+                        <div class="ip-block">
+                            <strong>🌐 IP Anda:</strong><br/>
+                            <code style="background:#000;padding:5px 10px;border-radius:5px;">${escapeHtml(data.user_ip || currentIp)}</code>
+                        </div>
+                        <div class="contact-buttons">
+                            <a href="https://wa.me/6281234567890?text=Halo%20Yama,%20saya%20mau%20konfirmasi%20IP%20cYama%20AI%0AIP%20saya:%20${encodeURIComponent(data.user_ip || currentIp)}" target="_blank" class="contact-btn whatsapp"><i class="fab fa-whatsapp"></i> Chat Owner</a>
+                            <a href="https://t.me/cYamaAI_bot" target="_blank" class="contact-btn telegram"><i class="fab fa-telegram"></i> Telegram</a>
+                        </div>
                 `;
             }
             
-            const time = document.createElement('div');
-            time.className = 'message-time';
-            time.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
-            
-            content.appendChild(errorContainer);
-            content.appendChild(time);
-            errorDiv.appendChild(avatar);
-            errorDiv.appendChild(content);
-            
-            chatMessages.appendChild(errorDiv);
+            errorHtml += `</div></div>`;
+            div.innerHTML = errorHtml;
+            chatMessages.appendChild(div);
             scrollToBottom();
         }
 
-        // Show typing indicator
-        function showTypingIndicator() {
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showTyping() {
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message bot';
             typingDiv.id = 'typingIndicator';
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar';
-            avatar.innerHTML = '<i class="fas fa-robot"></i>';
-            
-            const content = document.createElement('div');
-            content.className = 'message-content';
-            
-            const indicator = document.createElement('div');
-            indicator.className = 'typing-indicator';
-            indicator.innerHTML = '<span></span><span></span><span></span>';
-            
-            content.appendChild(indicator);
-            typingDiv.appendChild(avatar);
-            typingDiv.appendChild(content);
-            
+            typingDiv.innerHTML = `
+                <div class="message-avatar"><i class="fas fa-robot"></i></div>
+                <div class="message-content">
+                    <div class="typing-indicator"><span></span><span></span><span></span></div>
+                </div>
+            `;
             chatMessages.appendChild(typingDiv);
             scrollToBottom();
         }
 
-        // Remove typing indicator
-        function removeTypingIndicator() {
-            const indicator = document.getElementById('typingIndicator');
-            if (indicator) indicator.remove();
+        function removeTyping() {
+            const el = document.getElementById('typingIndicator');
+            if (el) el.remove();
         }
 
-        // Send message function
         async function sendMessage() {
             const message = messageInput.value.trim();
             if (!message || isTyping) return;
-            
-            // Command /ip
-            if (message.toLowerCase() === '/ip') {
-                addMessage(message, 'user');
-                messageInput.value = '';
-                messageInput.style.height = 'auto';
-                const ip = await fetchUserIp();
-                addSystemMessage(`🌐 IP Address Anda: ${ip}\n\n📞 Hubungi owner @cYamaAI (WhatsApp/Telegram) untuk whitelist IP.`, 'info');
-                return;
-            }
-            
-            // Command /help
-            if (message.toLowerCase() === '/help') {
-                addMessage(message, 'user');
-                messageInput.value = '';
-                messageInput.style.height = 'auto';
-                addSystemMessage(`📋 Daftar Perintah cYama AI:
-                
-/ip - Cek IP Address Anda
-/help - Menampilkan bantuan ini
-/owner - Info kontak owner
-
-💬 Chat biasa: Tanyakan apa saja ke AI!`, 'info');
-                return;
-            }
-            
-            // Command /owner
-            if (message.toLowerCase() === '/owner') {
-                addMessage(message, 'user');
-                messageInput.value = '';
-                messageInput.style.height = 'auto';
-                addSystemMessage(`👤 Owner cYama AI: Yama
-
-📱 WhatsApp: +62 882-8670-8193
-💬 Telegram: @Yamaxiar
-📧 Email: yusufhisyamaa@gmail.com
-🌐 Website: https://cyama-ai.vercel.app
-
-Klik tombol chat di bawah untuk langsung terhubung!`, 'info');
-                return;
-            }
             
             addMessage(message, 'user');
             messageInput.value = '';
             messageInput.style.height = 'auto';
             
-            showTypingIndicator();
+            showTyping();
             isTyping = true;
             sendButton.disabled = true;
             
             try {
-                const response = await fetch('/api/chat', {
+                const res = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message: message })
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
                 });
                 
-                const data = await response.json();
-                
-                removeTypingIndicator();
+                const data = await res.json();
+                removeTyping();
                 
                 if (data.success) {
                     addMessage(data.reply, 'bot');
                 } else {
-                    addDetailedError(data);
+                    addError(data);
                 }
             } catch (error) {
-                removeTypingIndicator();
-                addDetailedError({
-                    error: 'Koneksi Gagal',
-                    detail: error.message,
-                    solution: 'Periksa koneksi internet Anda dan refresh halaman',
-                    user_ip: currentUserIp
-                });
+                removeTyping();
+                addError({ error: 'Koneksi Gagal', detail: error.message, solution: 'Cek koneksi internet' });
             } finally {
                 isTyping = false;
                 sendButton.disabled = false;
                 messageInput.focus();
             }
         }
-        
-        // Event listeners
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
+
+        sendButton.onclick = sendMessage;
+        messageInput.onkeypress = (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
             }
-        });
+        };
         
-        // Load IP saat startup
-        fetchUserIp();
-        
-        // Focus input
+        fetchIp();
         messageInput.focus();
     </script>
 </body>
