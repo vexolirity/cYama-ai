@@ -1,19 +1,23 @@
 export default function handler(req, res) {
-    const getClientIp = (req) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    
+    const getIp = (req) => {
         const ip = req.headers['x-forwarded-for'] || 
                    req.headers['x-real-ip'] ||
                    req.headers['cf-connecting-ip'] ||
-                   req.connection?.remoteAddress ||
                    req.socket?.remoteAddress ||
+                   req.connection?.remoteAddress ||
                    '';
-        return ip.split(',')[0].trim();
+        return ip.split(',')[0].trim() || 'Tidak terdeteksi';
     };
     
-    const clientIp = getClientIp(req);
+    const serverIp = getIp(req);
     
     res.status(200).json({
-        ip: clientIp,
-        message: `IP Anda: ${clientIp}`,
-        contact_owner: 'https://wa.me/6288286708193?text=Halo%20Yama,%20saya%20mau%20konfirmasi%20IP%20untuk%20cYama%20AI'
+        success: true,
+        server_ip: serverIp,
+        message: 'Masukkan IP ini ke dashboard Neoxr untuk whitelist',
+        dashboard_url: 'https://api.neoxr.my.id/dashboard',
+        apikey_owner: 'Anda'
     });
 }
