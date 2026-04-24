@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cYama AI - Asisten Cerdas</title>
+    <title>cYama AI - GPT4</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Inter', sans-serif;
@@ -26,7 +30,7 @@
 
         .chat-wrapper {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1000px;
             height: 90vh;
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
@@ -88,22 +92,6 @@
         @keyframes pulse {
             0%,100% { opacity: 1; }
             50% { opacity: 0.5; }
-        }
-
-        .ip-bar {
-            background: rgba(0,0,0,0.4);
-            padding: 8px 20px;
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            color: rgba(255,255,255,0.6);
-        }
-
-        .ip-bar button {
-            background: none;
-            border: none;
-            color: #a78bfa;
-            cursor: pointer;
         }
 
         .chat-messages {
@@ -193,51 +181,8 @@
             border-left: 4px solid #ef4444;
             padding: 15px;
             border-radius: 10px;
-        }
-
-        .error-title {
             color: #fca5a5;
-            font-weight: 600;
-            margin-bottom: 10px;
         }
-
-        .error-detail {
-            color: #fecaca;
-            font-size: 13px;
-            margin-bottom: 8px;
-            padding-left: 20px;
-        }
-
-        .error-solution {
-            color: #bbf7d0;
-            font-size: 13px;
-            padding-left: 20px;
-            margin-top: 10px;
-        }
-
-        .ip-block {
-            background: rgba(0,0,0,0.4);
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            font-family: monospace;
-        }
-
-        .contact-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
-            border-radius: 25px;
-            text-decoration: none;
-            color: white;
-            font-weight: 500;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .contact-btn.whatsapp { background: #25D366; }
-        .contact-btn.telegram { background: #0088cc; }
 
         .chat-input-area {
             padding: 20px 30px;
@@ -321,17 +266,12 @@
                 <div class="logo"><i class="fas fa-brain"></i></div>
                 <div class="title">
                     <h1>cYama AI</h1>
-                    <p>Powered by GPT4 · CAI · Kimi</p>
+                    <p>Powered by GPT-4</p>
                 </div>
                 <div class="status">
                     <div class="status-dot"></div>
                     <span>Online</span>
                 </div>
-            </div>
-            
-            <div class="ip-bar">
-                <span><i class="fas fa-globe"></i> <span id="ipDisplay">Mendeteksi IP...</span></span>
-                <button id="checkIpBtn"><i class="fas fa-sync-alt"></i> Cek IP</button>
             </div>
 
             <div class="chat-messages" id="chatMessages">
@@ -339,8 +279,7 @@
                     <div class="message-avatar"><i class="fas fa-robot"></i></div>
                     <div class="message-content">
                         <div class="message-bubble">
-                            Halo! Saya <strong>cYama AI</strong>.<br>
-                            Saya menggunakan 3 AI: GPT4, Character AI, dan Kimi.<br>
+                            Halo! Saya <strong>cYama AI</strong> berbasis GPT-4.<br>
                             Ada yang bisa saya bantu? 😊
                         </div>
                         <div class="message-time">Sekarang</div>
@@ -361,10 +300,8 @@
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const ipDisplay = document.getElementById('ipDisplay');
         
         let isTyping = false;
-        let currentIp = '';
 
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
@@ -375,38 +312,19 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        async function fetchIp() {
-            try {
-                const res = await fetch('/api/ip');
-                const data = await res.json();
-                currentIp = data.server_ip;
-                ipDisplay.textContent = `IP: ${currentIp}`;
-            } catch (error) {
-                ipDisplay.textContent = 'IP: Gagal deteksi';
-            }
-        }
-
-        document.getElementById('checkIpBtn').onclick = () => {
-            addSystemMessage(`🌐 IP Server Vercel: ${currentIp || 'Tidak terdeteksi'}\n\n📋 Masukkan IP ini ke dashboard Neoxr untuk whitelist:\nhttps://api.neoxr.my.id/dashboard`);
-        };
-
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        function addMessage(text, sender, apiUsed = null) {
+        function addMessage(text, sender) {
             const div = document.createElement('div');
             div.className = `message ${sender}`;
-            let bubbleHtml = `<div class="message-bubble">${escapeHtml(text)}</div>`;
-            if (apiUsed && sender === 'bot') {
-                bubbleHtml += `<div style="font-size: 10px; color: #a78bfa; margin-top: 5px;">🤖 via ${apiUsed}</div>`;
-            }
             div.innerHTML = `
                 <div class="message-avatar"><i class="fas ${sender === 'user' ? 'fa-user' : 'fa-robot'}"></i></div>
                 <div class="message-content">
-                    ${bubbleHtml}
+                    <div class="message-bubble">${escapeHtml(text)}</div>
                     <div class="message-time">${new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' })}</div>
                 </div>
             `;
@@ -414,56 +332,16 @@
             scrollToBottom();
         }
 
-        function addSystemMessage(text) {
+        function addError(text) {
             const div = document.createElement('div');
             div.className = 'message bot';
             div.innerHTML = `
-                <div class="message-avatar"><i class="fas fa-info-circle"></i></div>
+                <div class="message-avatar"><i class="fas fa-exclamation-triangle"></i></div>
                 <div class="message-content">
-                    <div class="message-bubble" style="background:rgba(59,130,246,0.2);border-left:3px solid #3b82f6;">${escapeHtml(text)}</div>
+                    <div class="error-message">⚠️ ${escapeHtml(text)}</div>
                     <div class="message-time">${new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' })}</div>
                 </div>
             `;
-            chatMessages.appendChild(div);
-            scrollToBottom();
-        }
-
-        function addError(data) {
-            const div = document.createElement('div');
-            div.className = 'message bot';
-            
-            let errorHtml = `
-                <div class="message-avatar"><i class="fas fa-exclamation-triangle"></i></div>
-                <div class="message-content">
-                    <div class="error-message">
-                        <div class="error-title">⚠️ Error dari ${data.api_name || 'API'}</div>
-                        <div class="error-detail"><strong>Pesan Error:</strong><br>${escapeHtml(data.error || 'Unknown error')}</div>
-            `;
-            
-            if (data.server_ip) {
-                errorHtml += `<div class="error-detail"><strong>🌐 IP Server:</strong> ${data.server_ip}</div>`;
-            }
-            
-            if (data.need_whitelist) {
-                errorHtml += `
-                        <div class="ip-block">
-                            <strong>🔧 SOLUSI:</strong><br>
-                            1. Buka <a href="${data.dashboard_url}" style="color:#a78bfa;" target="_blank">${data.dashboard_url}</a><br>
-                            2. Login dengan akun Neoxr Anda<br>
-                            3. Masukkan IP Server: <strong>${data.server_ip || currentIp}</strong><br>
-                            4. Klik Save/Update<br>
-                            5. Refresh halaman ini
-                        </div>
-                        <div class="contact-buttons">
-                            <a href="https://wa.me/6281234567890?text=Halo%20Yama,%20saya%20mau%20konfirmasi%20IP%20cYama%20AI%0AIP%20server:%20${encodeURIComponent(data.server_ip || currentIp)}" target="_blank" class="contact-btn whatsapp"><i class="fab fa-whatsapp"></i> Chat Owner</a>
-                        </div>
-                `;
-            } else {
-                errorHtml += `<div class="error-solution"><strong>💡 Solusi:</strong><br>${data.solution || 'Coba lagi nanti'}</div>`;
-            }
-            
-            errorHtml += `</div></div>`;
-            div.innerHTML = errorHtml;
             chatMessages.appendChild(div);
             scrollToBottom();
         }
@@ -510,13 +388,13 @@
                 removeTyping();
                 
                 if (data.success) {
-                    addMessage(data.reply, 'bot', data.api_used);
+                    addMessage(data.reply, 'bot');
                 } else {
-                    addError(data);
+                    addError(data.error || 'Terjadi kesalahan');
                 }
             } catch (error) {
                 removeTyping();
-                addError({ error: 'Koneksi Gagal', detail: error.message, solution: 'Cek koneksi internet' });
+                addError('Gagal terhubung ke server: ' + error.message);
             } finally {
                 isTyping = false;
                 sendButton.disabled = false;
@@ -532,7 +410,6 @@
             }
         };
         
-        fetchIp();
         messageInput.focus();
     </script>
 </body>
