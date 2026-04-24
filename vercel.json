@@ -1,13 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "api/chat.js": {
-      "maxDuration": 30
-    },
-    "api/ip.js": {
-      "maxDuration": 10
-    }
-  },
   "rewrites": [
     {
       "source": "/(.*)",
