@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>cYama AI - Asisten Cerdas Premium</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -79,6 +79,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .logo {
@@ -128,6 +129,41 @@
         @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
+        }
+
+        /* IP Info Bar */
+        .ip-info-bar {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ip-display {
+            color: rgba(255, 255, 255, 0.6);
+            font-family: monospace;
+        }
+
+        .ip-display i {
+            margin-right: 5px;
+        }
+
+        .check-ip-btn {
+            background: rgba(139, 92, 246, 0.3);
+            border: none;
+            padding: 5px 12px;
+            border-radius: 15px;
+            color: white;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+
+        .check-ip-btn:hover {
+            background: rgba(139, 92, 246, 0.6);
         }
 
         /* Chat Area */
@@ -232,7 +268,7 @@
 
         /* Error Message */
         .error-message {
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.15);
             border-left: 4px solid #ef4444;
             padding: 15px;
             border-radius: 10px;
@@ -260,6 +296,52 @@
             font-size: 13px;
             padding-left: 25px;
             white-space: pre-line;
+        }
+
+        .ip-block {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+
+        .contact-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .contact-btn.whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+        }
+
+        .contact-btn.telegram {
+            background: linear-gradient(135deg, #0088cc, #004c6e);
+        }
+
+        .contact-btn.email {
+            background: linear-gradient(135deg, #ea4335, #c5221f);
+        }
+
+        .contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         /* Input Area */
@@ -363,6 +445,70 @@
                 opacity: 1;
             }
         }
+
+        /* Scroll to bottom button */
+        .scroll-btn {
+            position: absolute;
+            bottom: 100px;
+            right: 30px;
+            background: rgba(139, 92, 246, 0.8);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .scroll-btn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .scroll-btn:hover {
+            background: rgba(139, 92, 246, 1);
+            transform: scale(1.1);
+        }
+
+        @media (max-width: 768px) {
+            .chat-wrapper {
+                height: 95vh;
+                border-radius: 20px;
+            }
+            
+            .chat-header {
+                padding: 15px;
+            }
+            
+            .title h1 {
+                font-size: 20px;
+            }
+            
+            .title p {
+                font-size: 11px;
+            }
+            
+            .chat-messages {
+                padding: 15px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+            
+            .contact-buttons {
+                flex-direction: column;
+            }
+            
+            .contact-btn {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -384,6 +530,16 @@
                     </div>
                 </div>
             </div>
+            
+            <div class="ip-info-bar">
+                <div class="ip-display">
+                    <i class="fas fa-globe"></i> 
+                    <span id="userIpDisplay">Mendeteksi IP...</span>
+                </div>
+                <button class="check-ip-btn" id="checkIpBtn">
+                    <i class="fas fa-sync-alt"></i> Cek IP Saya
+                </button>
+            </div>
 
             <div class="chat-messages" id="chatMessages">
                 <div class="message bot">
@@ -392,7 +548,9 @@
                     </div>
                     <div class="message-content">
                         <div class="message-bubble">
-                            Halo! Saya <strong>cYama AI</strong>, asisten cerdas Anda. Ada yang bisa saya bantu? 😊
+                            Halo! Saya <strong>cYama AI</strong>, asisten cerdas Anda.<br/><br/>
+                            ✨ Ada yang bisa saya bantu?<br/>
+                            💡 Tips: Ketik <code style="background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:4px;">/ip</code> untuk cek IP Anda
                         </div>
                         <div class="message-time">Sekarang</div>
                     </div>
@@ -409,6 +567,9 @@
                     </button>
                 </div>
             </div>
+        </div>
+        <div class="scroll-btn" id="scrollBtn">
+            <i class="fas fa-chevron-down"></i>
         </div>
     </div>
 
@@ -431,11 +592,15 @@
         }
         createParticles();
 
+        // DOM Elements
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
+        const scrollBtn = document.getElementById('scrollBtn');
+        const userIpDisplay = document.getElementById('userIpDisplay');
         
         let isTyping = false;
+        let currentUserIp = '';
 
         // Auto-resize textarea
         messageInput.addEventListener('input', function() {
@@ -443,55 +608,46 @@
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
 
-        // Send message function
-        async function sendMessage() {
-            const message = messageInput.value.trim();
-            if (!message || isTyping) return;
-            
-            // Add user message
-            addMessage(message, 'user');
-            messageInput.value = '';
-            messageInput.style.height = 'auto';
-            
-            // Show typing indicator
-            showTypingIndicator();
-            isTyping = true;
-            sendButton.disabled = true;
-            
+        // Scroll to bottom
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Show/hide scroll button
+        chatMessages.addEventListener('scroll', () => {
+            const isNearBottom = chatMessages.scrollHeight - chatMessages.scrollTop - chatMessages.clientHeight < 100;
+            if (isNearBottom) {
+                scrollBtn.classList.remove('show');
+            } else {
+                scrollBtn.classList.add('show');
+            }
+        });
+
+        scrollBtn.addEventListener('click', () => {
+            scrollToBottom();
+        });
+
+        // Get User IP dari backend
+        async function fetchUserIp() {
             try {
-                const response = await fetch('/api/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message: message })
-                });
-                
+                const response = await fetch('/api/ip');
                 const data = await response.json();
-                
-                // Remove typing indicator
-                removeTypingIndicator();
-                
-                if (data.success) {
-                    addMessage(data.reply, 'bot');
-                } else {
-                    // Tampilkan error detail
-                    addErrorMessage(data.error, data.detail, data.solution);
-                }
+                currentUserIp = data.ip;
+                userIpDisplay.innerHTML = `<i class="fas fa-globe"></i> IP: ${currentUserIp}`;
+                return currentUserIp;
             } catch (error) {
-                removeTypingIndicator();
-                addErrorMessage(
-                    'Koneksi Gagal',
-                    error.message,
-                    'Periksa koneksi internet Anda dan coba lagi. Jika masalah berlanjut, server mungkin sedang maintenance.'
-                );
-            } finally {
-                isTyping = false;
-                sendButton.disabled = false;
-                messageInput.focus();
+                userIpDisplay.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Gagal deteksi IP`;
+                return 'Tidak terdeteksi';
             }
         }
-        
+
+        // Cek IP manual
+        document.getElementById('checkIpBtn').addEventListener('click', async () => {
+            const ip = await fetchUserIp();
+            addSystemMessage(`🌐 IP Address Anda: ${ip}\n\n📞 Hubungi owner @cYamaAI jika ingin whitelist IP ini.`, 'info');
+        });
+
+        // Add message to chat
         function addMessage(text, sender) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${sender}`;
@@ -519,8 +675,40 @@
             chatMessages.appendChild(messageDiv);
             scrollToBottom();
         }
-        
-        function addErrorMessage(title, detail, solution) {
+
+        // Add system message (info, error, etc)
+        function addSystemMessage(text, type = 'info') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message bot`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = type === 'error' ? '<i class="fas fa-exclamation-triangle"></i>' : '<i class="fas fa-info-circle"></i>';
+            
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            bubble.style.background = type === 'error' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(59, 130, 246, 0.2)';
+            bubble.style.borderLeft = type === 'error' ? '3px solid #ef4444' : '3px solid #3b82f6';
+            bubble.textContent = text;
+            
+            const time = document.createElement('div');
+            time.className = 'message-time';
+            time.textContent = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+            
+            content.appendChild(bubble);
+            content.appendChild(time);
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        // Add detailed error message with contact buttons
+        function addDetailedError(data) {
             const errorDiv = document.createElement('div');
             errorDiv.className = 'message bot';
             
@@ -534,18 +722,59 @@
             const errorContainer = document.createElement('div');
             errorContainer.className = 'error-message';
             
-            errorContainer.innerHTML = `
-                <div class="error-title">
-                    <i class="fas fa-times-circle"></i>
-                    <span>⚠️ ${title}</span>
-                </div>
-                <div class="error-detail">
-                    <strong>Detail Error:</strong> ${detail}
-                </div>
-                <div class="error-solution">
-                    <strong>💡 Solusi:</strong><br>${solution}
-                </div>
-            `;
+            // Cek apakah error karena IP belum dikonfirmasi
+            if (data.need_whitelist || data.error?.includes('IP belum dikonfirmasi')) {
+                const userIp = data.user_ip || currentUserIp || 'Tidak terdeteksi';
+                
+                errorContainer.innerHTML = `
+                    <div class="error-title">
+                        <i class="fas fa-ban" style="color: #f87171;"></i>
+                        <span style="color: #f87171;">⚠️ ${data.error || 'IP belum dikonfirmasi'}</span>
+                    </div>
+                    <div class="ip-block">
+                        <strong><i class="fas fa-network-wired"></i> IP Address Anda:</strong><br/>
+                        <code style="background: #000; padding: 8px 12px; border-radius: 8px; display: inline-block; margin-top: 8px; font-size: 16px; font-weight: bold;">${userIp}</code>
+                    </div>
+                    <div class="error-detail">
+                        <strong>📝 Detail:</strong><br/>${data.detail || 'IP Anda belum terdaftar di whitelist API'}
+                    </div>
+                    <div class="error-solution">
+                        <strong>💡 Solusi:</strong><br/>
+                        ${data.solution || 'Hubungi owner untuk konfirmasi IP'}
+                    </div>
+                    <div class="contact-buttons">
+                        <a href="https://wa.me/6288286708193?text=Halo%20Yama,%20saya%20mau%20konfirmasi%20IP%20untuk%20cYama%20AI%0A%0ANama:%20%0AIP%20saya:%20${encodeURIComponent(userIp)}%0ATolong%20didaftarkan%20ke%20whitelist%20ya" 
+                           target="_blank" 
+                           class="contact-btn whatsapp">
+                            <i class="fab fa-whatsapp"></i> Chat Owner (Yama)
+                        </a>
+                        <a href="https://t.me/cYamaAI_bot" 
+                           target="_blank" 
+                           class="contact-btn telegram">
+                            <i class="fab fa-telegram"></i> Telegram @cYamaAI_bot
+                        </a>
+                        <a href="mailto:support@cyama.ai?subject=Whitelist%20IP%20cYama%20AI&body=Nama%3A%20%0AIP%20saya%3A%20${encodeURIComponent(userIp)}%0AMohon%20didaftarkan%20ke%20whitelist" 
+                           class="contact-btn email">
+                            <i class="fas fa-envelope"></i> Email Support
+                        </a>
+                    </div>
+                `;
+            } else {
+                // Error biasa
+                errorContainer.innerHTML = `
+                    <div class="error-title">
+                        <i class="fas fa-times-circle"></i>
+                        <span>⚠️ ${data.error || 'Terjadi Kesalahan'}</span>
+                    </div>
+                    <div class="error-detail">
+                        <strong>Detail Error:</strong> ${data.detail || 'Unknown error'}
+                    </div>
+                    ${data.user_ip ? `<div class="error-detail"><strong>IP Anda:</strong> ${data.user_ip}</div>` : ''}
+                    <div class="error-solution">
+                        <strong>💡 Solusi:</strong><br/>${data.solution || 'Coba lagi nanti atau hubungi owner'}
+                    </div>
+                `;
+            }
             
             const time = document.createElement('div');
             time.className = 'message-time';
@@ -559,7 +788,8 @@
             chatMessages.appendChild(errorDiv);
             scrollToBottom();
         }
-        
+
+        // Show typing indicator
         function showTypingIndicator() {
             const typingDiv = document.createElement('div');
             typingDiv.className = 'message bot';
@@ -583,14 +813,98 @@
             chatMessages.appendChild(typingDiv);
             scrollToBottom();
         }
-        
+
+        // Remove typing indicator
         function removeTypingIndicator() {
             const indicator = document.getElementById('typingIndicator');
             if (indicator) indicator.remove();
         }
-        
-        function scrollToBottom() {
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+        // Send message function
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message || isTyping) return;
+            
+            // Command /ip
+            if (message.toLowerCase() === '/ip') {
+                addMessage(message, 'user');
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+                const ip = await fetchUserIp();
+                addSystemMessage(`🌐 IP Address Anda: ${ip}\n\n📞 Hubungi owner @cYamaAI (WhatsApp/Telegram) untuk whitelist IP.`, 'info');
+                return;
+            }
+            
+            // Command /help
+            if (message.toLowerCase() === '/help') {
+                addMessage(message, 'user');
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+                addSystemMessage(`📋 Daftar Perintah cYama AI:
+                
+/ip - Cek IP Address Anda
+/help - Menampilkan bantuan ini
+/owner - Info kontak owner
+
+💬 Chat biasa: Tanyakan apa saja ke AI!`, 'info');
+                return;
+            }
+            
+            // Command /owner
+            if (message.toLowerCase() === '/owner') {
+                addMessage(message, 'user');
+                messageInput.value = '';
+                messageInput.style.height = 'auto';
+                addSystemMessage(`👤 Owner cYama AI: Yama
+
+📱 WhatsApp: +62 882-8670-8193
+💬 Telegram: @Yamaxiar
+📧 Email: yusufhisyamaa@gmail.com
+🌐 Website: https://cyama-ai.vercel.app
+
+Klik tombol chat di bawah untuk langsung terhubung!`, 'info');
+                return;
+            }
+            
+            addMessage(message, 'user');
+            messageInput.value = '';
+            messageInput.style.height = 'auto';
+            
+            showTypingIndicator();
+            isTyping = true;
+            sendButton.disabled = true;
+            
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                
+                removeTypingIndicator();
+                
+                if (data.success) {
+                    addMessage(data.reply, 'bot');
+                } else {
+                    addDetailedError(data);
+                }
+            } catch (error) {
+                removeTypingIndicator();
+                addDetailedError({
+                    error: 'Koneksi Gagal',
+                    detail: error.message,
+                    solution: 'Periksa koneksi internet Anda dan refresh halaman',
+                    user_ip: currentUserIp
+                });
+            } finally {
+                isTyping = false;
+                sendButton.disabled = false;
+                messageInput.focus();
+            }
         }
         
         // Event listeners
@@ -601,6 +915,12 @@
                 sendMessage();
             }
         });
+        
+        // Load IP saat startup
+        fetchUserIp();
+        
+        // Focus input
+        messageInput.focus();
     </script>
 </body>
 </html>
