@@ -1,0 +1,10 @@
+{
+  "name": "cyama-ai",
+  "version": "1.0.0",
+  "description": "cYama AI - Asisten Cerdas dengan API Blackbox",
+  "type": "module",
+  "scripts": {
+    "dev": "node api/chat.js"
+  },
+  "dependencies": {}
+}
