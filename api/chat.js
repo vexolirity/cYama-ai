@@ -1,4 +1,3 @@
-cat > api/chat.js << 'EOF'
 export default async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -35,4 +34,3 @@ export default async function handler(req, res) {
         return res.status(500).json({ success: false, error: error.message });
     }
 }
-EOF
