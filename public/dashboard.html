@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>cYama AI - Premium Chat</title>
+    <title>cYama AI - Chat</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -38,7 +38,6 @@
             left: 0;
         }
         
-        /* LOADING SCREEN - FIX LAYAR PUTIH */
         .loading-screen {
             position: fixed;
             top: 0;
@@ -66,7 +65,7 @@
             border: 3px solid rgba(139,92,246,0.2);
             border-top: 3px solid #8b5cf6;
             border-radius: 50%;
-            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+            animation: spin 1s ease infinite;
         }
         
         @keyframes spin {
@@ -74,13 +73,6 @@
             100% { transform: rotate(360deg); }
         }
         
-        .loading-text {
-            font-size: 14px;
-            color: rgba(255,255,255,0.5);
-            letter-spacing: 2px;
-        }
-        
-        /* Animated background */
         .animated-bg {
             position: fixed;
             top: 0;
@@ -117,9 +109,7 @@
             transition: opacity 0.5s ease;
         }
         
-        .app.visible {
-            opacity: 1;
-        }
+        .app.visible { opacity: 1; }
         
         /* SIDEBAR */
         .sidebar {
@@ -201,6 +191,16 @@
             -webkit-text-fill-color: transparent;
         }
         
+        .icon-btn {
+            background: rgba(139,92,246,0.15);
+            border: 1px solid var(--border-color);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+        }
+        
         .messages {
             flex: 1;
             overflow-y: auto;
@@ -251,11 +251,9 @@
         .message.bot .message-bubble {
             background: rgba(255,255,255,0.06);
             border-bottom-left-radius: 6px;
-            backdrop-filter: blur(10px);
             border: 1px solid rgba(139,92,246,0.2);
         }
         
-        /* INPUT AREA */
         .input-area {
             padding: 12px 16px 20px;
             background: rgba(10,10,26,0.7);
@@ -281,10 +279,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
         }
-        
-        .input-btn:active, .send-btn:active { transform: scale(0.95); }
         
         .send-btn {
             background: linear-gradient(135deg, #8b5cf6, #6d28d9);
@@ -334,7 +329,6 @@
             30% { transform: translateY(-10px); opacity: 1; }
         }
         
-        /* MODAL */
         .modal {
             display: none;
             position: fixed;
@@ -392,6 +386,22 @@
         .upload-area:hover { border-color: #8b5cf6; background: rgba(139,92,246,0.1); }
         .image-preview { max-width: 100%; border-radius: 20px; margin-top: 16px; }
         
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .setting-item select {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border-color);
+            padding: 8px 14px;
+            border-radius: 30px;
+            color: white;
+        }
+        
         @media (min-width: 768px) {
             .sidebar { position: relative; left: 0 !important; }
             .menu-btn { display: none; }
@@ -405,7 +415,6 @@
     </style>
 </head>
 <body>
-    <!-- LOADING SCREEN - FIX LAYAR PUTIH -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loader"></div>
         <div class="loading-text">Loading cYama AI...</div>
@@ -445,7 +454,7 @@
                 <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
                 <div class="chat-title-header" id="chatTitle">cYama AI</div>
                 <div class="header-actions">
-                    <button class="input-btn" id="settingsBtn" style="width:40px;height:40px;"><i class="fas fa-sliders-h"></i></button>
+                    <button class="icon-btn" id="settingsBtn"><i class="fas fa-sliders-h"></i></button>
                 </div>
             </div>
             
@@ -474,19 +483,19 @@
     <div class="modal" id="settingsModal">
         <div class="modal-content">
             <div class="modal-header"><span>⚙️ Pengaturan</span><span class="modal-close" onclick="closeModal('settingsModal')">&times;</span></div>
-            <div class="setting-item" style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-color);">
+            <div class="setting-item">
                 <span>🤖 AI Personality</span>
-                <select id="personalitySelect" style="background:rgba(255,255,255,0.1);border:1px solid var(--border-color);padding:8px 14px;border-radius:30px;color:white;">
+                <select id="personalitySelect">
                     <option value="formal">Formal & Profesional</option>
                     <option value="santai">Santai & Ramah</option>
                     <option value="lucu">Lucu & Menghibur</option>
                 </select>
             </div>
-            <div class="setting-item" style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-color);">
+            <div class="setting-item">
                 <span>🌙 Dark Mode</span>
                 <input type="checkbox" id="darkModeToggle">
             </div>
-            <div class="setting-item" style="display:flex;justify-content:space-between;padding:14px 0;">
+            <div class="setting-item">
                 <span>🗑️ Incognito Mode</span>
                 <input type="checkbox" id="incognitoToggle">
             </div>
@@ -509,24 +518,22 @@
     </div>
     
     <script>
-        // ============ HIDE LOADING SCREEN ============
+        // LOADING SCREEN
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                const loadingScreen = document.getElementById('loadingScreen');
-                const app = document.getElementById('app');
-                if(loadingScreen) loadingScreen.classList.add('hide');
-                if(app) app.classList.add('visible');
+                document.getElementById('loadingScreen').classList.add('hide');
+                document.getElementById('app').classList.add('visible');
             }, 500);
         });
         
-        // ============ AUTH CHECK ============
+        // AUTH
         let auth = localStorage.getItem('cyama_auth');
         let user = JSON.parse(localStorage.getItem('cyama_user') || '{}');
         let isGuest = auth !== 'true';
         
         if (!auth && auth !== 'guest') window.location.href = '/';
         
-        // ============ DOM ELEMENTS ============
+        // DOM
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const menuBtn = document.getElementById('menuBtn');
@@ -537,7 +544,7 @@
         const chatsList = document.getElementById('chatsList');
         const chatTitle = document.getElementById('chatTitle');
         
-        // ============ SIDEBAR CONTROLS ============
+        // SIDEBAR
         function closeSidebar() { sidebar.classList.remove('open'); if(overlay) overlay.classList.remove('active'); }
         function openSidebar() { sidebar.classList.add('open'); if(overlay) overlay.classList.add('active'); }
         function toggleSidebar() { if(sidebar.classList.contains('open')) closeSidebar(); else openSidebar(); }
@@ -546,7 +553,7 @@
         if(mainChatArea) mainChatArea.addEventListener('click', () => { if(sidebar.classList.contains('open')) closeSidebar(); });
         if(overlay) overlay.addEventListener('click', closeSidebar);
         
-        // ============ CHAT LOGIC ============
+        // CHAT LOGIC
         let currentChatId = null;
         let chats = {};
         let incognito = false;
@@ -660,7 +667,6 @@
             renderMessages(chat.messages);
         }
         
-        // ============ FIXED API CALL ============
         async function sendToAI(message, imageBase64 = null) {
             let personality = localStorage.getItem('cyama_personality') || 'formal';
             try {
@@ -673,19 +679,9 @@
                     body: JSON.stringify(body) 
                 });
                 
-                // FIX: Cek response type
-                const text = await res.text();
-                let data;
-                try {
-                    data = JSON.parse(text);
-                } catch(e) {
-                    console.error('Response bukan JSON:', text.substring(0, 200));
-                    return `⚠️ Server error: ${text.substring(0, 100)}`;
-                }
-                
+                const data = await res.json();
                 return data.success ? data.reply : `⚠️ ${data.error || 'Terjadi kesalahan'}`;
             } catch(e) { 
-                console.error('API error:', e);
                 return `⚠️ ${e.message}`; 
             }
         }
@@ -710,7 +706,7 @@
             
             let reply;
             if(selectedImageBase64) {
-                let question = document.getElementById('imageQuestion')?.value || 'Deskripsikan gambar ini dalam detail';
+                let question = document.getElementById('imageQuestion')?.value || 'Deskripsikan gambar ini dalam bahasa Indonesia secara detail';
                 reply = await sendToAI(question, selectedImageBase64);
                 selectedImageBase64 = null;
                 document.getElementById('imagePreview').innerHTML = '';
@@ -723,7 +719,7 @@
             addMessage('bot', reply);
         }
         
-        // Voice
+        // VOICE
         let recognition = null;
         if('webkitSpeechRecognition' in window) {
             recognition = new webkitSpeechRecognition();
@@ -737,7 +733,7 @@
             } else alert('Voice tidak support');
         };
         
-        // Upload - FIXED tanpa /api/upload, langsung kirim base64 ke /api/chat
+        // UPLOAD IMAGE
         document.getElementById('uploadBtn').onclick = () => document.getElementById('uploadModal').style.display = 'flex';
         document.getElementById('uploadArea').onclick = () => document.getElementById('fileInput').click();
         document.getElementById('fileInput').onchange = (e) => {
@@ -757,7 +753,7 @@
         };
         document.getElementById('processImageBtn').onclick = () => sendMessage();
         
-        // Settings
+        // SETTINGS
         document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
         document.getElementById('darkModeToggle').onchange = (e) => {
             if(e.target.checked) document.body.style.setProperty('--bg-primary', '#000000');
@@ -766,20 +762,21 @@
         document.getElementById('personalitySelect').onchange = (e) => localStorage.setItem('cyama_personality', e.target.value);
         document.getElementById('incognitoToggle').onchange = (e) => incognito = e.target.checked;
         
-        // Search
+        // SEARCH
         document.getElementById('searchInput').oninput = () => renderChatsList();
         
-        // Auto resize textarea
+        // AUTO RESIZE TEXTAREA
         messageInput.oninput = function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 100) + 'px';
         };
         
+        // EVENT LISTENERS
         document.getElementById('newChatBtn').onclick = createNewChat;
         sendBtn.onclick = sendMessage;
         messageInput.onkeypress = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
         
-        // Footer
+        // FOOTER
         document.getElementById('sidebarFooter').innerHTML = isGuest ? `
             <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#4c1d95);display:flex;align-items:center;justify-content:center;"><i class="fas fa-user"></i></div>
             <div style="flex:1;font-size:14px;font-weight:500;">Tamu</div>
@@ -790,6 +787,7 @@
             <button onclick="localStorage.clear();location.reload()" style="background:none;border:none;color:white;font-size:20px;"><i class="fas fa-sign-out-alt"></i></button>
         `;
         
+        // START
         loadChats();
         messageInput.focus();
         
