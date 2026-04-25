@@ -2,23 +2,27 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>cYama AI - Asisten Cerdas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>cYama AI - Premium AI Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         
         body {
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
-            background: linear-gradient(145deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background: radial-gradient(ellipse at 20% 30%, #0f0c29, #1a1a3e, #0a0a1a);
             position: relative;
             overflow-x: hidden;
         }
         
-        /* Animated Background */
-        .bg-animation {
+        /* Animated gradient background */
+        .animated-bg {
             position: fixed;
             top: 0;
             left: 0;
@@ -28,27 +32,25 @@
             overflow: hidden;
         }
         
-        .glow {
+        .orb {
             position: absolute;
-            width: 400px;
-            height: 400px;
             border-radius: 50%;
-            filter: blur(100px);
-            animation: float 15s infinite ease-in-out;
+            filter: blur(80px);
+            animation: orbFloat 25s infinite ease-in-out;
         }
         
-        .glow-1 { background: #8b5cf6; top: -150px; left: -150px; animation-delay: 0s; }
-        .glow-2 { background: #ec4899; bottom: -150px; right: -150px; animation-delay: -5s; }
-        .glow-3 { background: #06b6d4; top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -10s; width: 300px; height: 300px; }
-        .glow-4 { background: #10b981; bottom: 20%; left: 10%; animation-delay: -7s; width: 250px; height: 250px; }
+        .orb-1 { width: 500px; height: 500px; background: #8b5cf6; top: -200px; left: -200px; opacity: 0.4; }
+        .orb-2 { width: 400px; height: 400px; background: #ec4899; bottom: -150px; right: -150px; opacity: 0.3; animation-delay: -8s; }
+        .orb-3 { width: 350px; height: 350px; background: #06b6d4; top: 40%; left: 30%; opacity: 0.25; animation-delay: -15s; }
+        .orb-4 { width: 300px; height: 300px; background: #10b981; bottom: 20%; left: 10%; opacity: 0.2; animation-delay: -5s; }
         
-        @keyframes float {
-            0%,100% { transform: translate(0,0) scale(1); opacity: 0.4; }
-            33% { transform: translate(40px,-40px) scale(1.2); opacity: 0.6; }
-            66% { transform: translate(-30px,30px) scale(0.8); opacity: 0.3; }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(60px, -60px) scale(1.1); }
+            66% { transform: translate(-50px, 50px) scale(0.9); }
         }
         
-        /* Particles */
+        /* Floating particles */
         .particles {
             position: fixed;
             top: 0;
@@ -61,19 +63,19 @@
         
         .particle {
             position: absolute;
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.1);
             border-radius: 50%;
-            animation: particleFly 12s infinite linear;
+            animation: floatParticle 20s infinite linear;
         }
         
-        @keyframes particleFly {
+        @keyframes floatParticle {
             0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.5; }
-            90% { opacity: 0.5; }
+            10% { opacity: 0.4; }
+            90% { opacity: 0.4; }
             100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
         
-        /* Login Card */
+        /* Main container */
         .login-container {
             position: relative;
             z-index: 2;
@@ -85,55 +87,72 @@
         }
         
         .login-card {
-            background: rgba(255,255,255,0.05);
-            backdrop-filter: blur(20px);
-            border-radius: 48px;
-            padding: 48px 32px;
+            background: rgba(15, 15, 35, 0.6);
+            backdrop-filter: blur(25px);
+            border-radius: 56px;
+            padding: 52px 36px;
             width: 100%;
-            max-width: 400px;
+            max-width: 460px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.15);
-            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
-            animation: fadeInUp 0.6s ease;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(139,92,246,0.1);
+            animation: slideUpFade 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
         }
         
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(40px) scale(0.96); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
         
-        .logo {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #ffd89b, #c7e9fb);
-            border-radius: 30px;
+        .logo-wrapper {
+            margin-bottom: 28px;
+        }
+        
+        .logo-ring {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto;
+            background: linear-gradient(135deg, #8b5cf6, #c084fc, #4c1d95);
+            border-radius: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 24px;
+            animation: pulseGlow 3s infinite;
+            box-shadow: 0 0 30px rgba(139,92,246,0.5);
         }
         
-        .logo i { font-size: 48px; color: #4c1d95; }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(139,92,246,0.3); transform: scale(1); }
+            50% { box-shadow: 0 0 50px rgba(139,92,246,0.7); transform: scale(1.02); }
+        }
+        
+        .logo-ring i { font-size: 52px; color: white; }
         
         h1 {
-            font-size: 32px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff, #c7e9fb);
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, #c7e9fb, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
         }
         
-        .tagline {
-            color: rgba(255,255,255,0.6);
-            font-size: 14px;
-            margin-bottom: 32px;
+        .badge {
+            display: inline-block;
+            background: rgba(139,92,246,0.2);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 12px;
+            color: #a78bfa;
+            margin-bottom: 24px;
+            border: 1px solid rgba(139,92,246,0.3);
         }
         
         .google-btn {
             width: 100%;
-            padding: 16px;
+            padding: 18px;
             background: white;
             border: none;
             border-radius: 60px;
@@ -146,96 +165,123 @@
             gap: 12px;
             cursor: pointer;
             transition: all 0.3s;
-            margin-bottom: 12px;
+            margin-bottom: 14px;
         }
         
-        .google-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .google-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        .google-btn:active { transform: translateY(0); }
         
         .guest-btn {
             width: 100%;
-            padding: 14px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
+            padding: 16px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(139,92,246,0.4);
             border-radius: 60px;
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
             color: white;
             cursor: pointer;
             transition: all 0.3s;
         }
         
-        .guest-btn:hover { background: rgba(255,255,255,0.2); }
+        .guest-btn:hover { background: rgba(139,92,246,0.2); border-color: #8b5cf6; }
         
-        .features {
-            margin-top: 40px;
-            display: grid;
-            grid-template-columns: repeat(2,1fr);
-            gap: 12px;
-            text-align: left;
-        }
-        
-        .feature-item {
+        .divider {
+            margin: 32px 0 24px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: rgba(255,255,255,0.6);
+            gap: 12px;
+            color: rgba(255,255,255,0.3);
             font-size: 12px;
         }
+        .divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
         
-        .feature-item i { width: 20px; color: #8b5cf6; }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            text-align: left;
+            margin-top: 8px;
+        }
+        
+        .feature-card {
+            background: rgba(255,255,255,0.03);
+            border-radius: 20px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .feature-card i { font-size: 18px; color: #a78bfa; width: 28px; }
+        .feature-card span { font-size: 12px; color: rgba(255,255,255,0.7); font-weight: 500; }
         
         @media (max-width: 480px) {
-            .login-card { padding: 32px 24px; }
-            h1 { font-size: 28px; }
-            .features { grid-template-columns: 1fr; }
+            .login-card { padding: 36px 24px; margin: 16px; }
+            h1 { font-size: 36px; }
+            .features-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="glow glow-1"></div>
-        <div class="glow glow-2"></div>
-        <div class="glow glow-3"></div>
-        <div class="glow glow-4"></div>
+    <div class="animated-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
     </div>
     <div class="particles" id="particles"></div>
     
     <div class="login-container">
         <div class="login-card">
-            <div class="logo"><i class="fas fa-brain"></i></div>
+            <div class="logo-wrapper">
+                <div class="logo-ring">
+                    <i class="fas fa-brain"></i>
+                </div>
+            </div>
             <h1>cYama AI</h1>
-            <div class="tagline">Asisten Cerdas Berbasis GPT-4</div>
+            <div class="badge">✨ Powered by GPT-4</div>
             
-            <button class="google-btn" onclick="location.href='/api/auth/google'">
+            <button class="google-btn" id="googleLoginBtn">
                 <i class="fab fa-google"></i> Lanjut dengan Google
             </button>
             
-            <button class="guest-btn" onclick="guestLogin()">
-                Gunakan sebagai Tamu
+            <button class="guest-btn" id="guestLoginBtn">
+                🎭 Gunakan sebagai Tamu
             </button>
             
-            <div class="features">
-                <div class="feature-item"><i class="fas fa-check-circle"></i> Chat dengan GPT-4</div>
-                <div class="feature-item"><i class="fas fa-check-circle"></i> Upload & Deskripsi Gambar</div>
-                <div class="feature-item"><i class="fas fa-check-circle"></i> Multi Chat & History</div>
-                <div class="feature-item"><i class="fas fa-check-circle"></i> Voice Input</div>
-                <div class="feature-item"><i class="fas fa-check-circle"></i> AI Personality</div>
-                <div class="feature-item"><i class="fas fa-check-circle"></i> Dark Mode</div>
+            <div class="divider">
+                <div class="divider-line"></div>
+                <span>Fitur Premium</span>
+                <div class="divider-line"></div>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card"><i class="fas fa-comments"></i><span>GPT-4 Chat</span></div>
+                <div class="feature-card"><i class="fas fa-image"></i><span>Vision AI</span></div>
+                <div class="feature-card"><i class="fas fa-microphone"></i><span>Voice Input</span></div>
+                <div class="feature-card"><i class="fas fa-palette"></i><span>AI Personality</span></div>
+                <div class="feature-card"><i class="fas fa-folder-tree"></i><span>Multi Chat</span></div>
+                <div class="feature-card"><i class="fas fa-shield-alt"></i><span>Private Mode</span></div>
             </div>
         </div>
     </div>
     
     <script>
+        // Create particles
         function createParticles() {
             const container = document.getElementById('particles');
-            for(let i = 0; i < 60; i++) {
+            for(let i = 0; i < 80; i++) {
                 const p = document.createElement('div');
                 p.classList.add('particle');
-                p.style.width = Math.random() * 5 + 1 + 'px';
+                p.style.width = Math.random() * 6 + 2 + 'px';
                 p.style.height = p.style.width;
                 p.style.left = Math.random() * 100 + '%';
-                p.style.animationDelay = Math.random() * 15 + 's';
-                p.style.animationDuration = Math.random() * 10 + 8 + 's';
+                p.style.animationDelay = Math.random() * 20 + 's';
+                p.style.animationDuration = Math.random() * 15 + 10 + 's';
+                p.style.opacity = Math.random() * 0.5;
                 container.appendChild(p);
             }
         }
@@ -243,12 +289,19 @@
         
         function guestLogin() {
             localStorage.setItem('cyama_auth', 'guest');
-            localStorage.setItem('cyama_user', JSON.stringify({ name: 'Tamu' }));
-            location.href = '/dashboard.html';
+            localStorage.setItem('cyama_user', JSON.stringify({ name: 'Tamu', picture: null }));
+            window.location.href = '/dashboard';
         }
         
-        if (localStorage.getItem('cyama_auth') === 'true') {
-            location.href = '/dashboard.html';
+        document.getElementById('googleLoginBtn').onclick = () => {
+            window.location.href = '/api/auth/google';
+        };
+        
+        document.getElementById('guestLoginBtn').onclick = guestLogin;
+        
+        // Auto redirect if already logged in
+        if (localStorage.getItem('cyama_auth') === 'true' || localStorage.getItem('cyama_auth') === 'guest') {
+            window.location.href = '/dashboard';
         }
     </script>
 </body>
