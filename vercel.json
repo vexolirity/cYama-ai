@@ -1,9 +1,24 @@
 {
   "version": 2,
   "functions": {
-    "api/chat.js": { "maxDuration": 30 },
-    "api/upload.js": { "maxDuration": 30 },
-    "api/auth/*.js": { "maxDuration": 10 }
+    "api/chat.js": {
+      "maxDuration": 30
+    },
+    "api/upload.js": {
+      "maxDuration": 30
+    },
+    "api/auth/*.js": {
+      "maxDuration": 10
+    }
   },
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/dashboard.html"
+    }
+  ]
 }
