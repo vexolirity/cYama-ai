@@ -2,519 +2,509 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>cYama AI - Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+    <title>cYama AI - Chat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         :root {
-            --bg-primary: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            --sidebar-bg: rgba(0,0,0,0.4);
-            --message-user: linear-gradient(135deg, #8b5cf6, #6d28d9);
-            --message-bot: rgba(255,255,255,0.1);
-            --text-white: white;
-            --border-color: rgba(255,255,255,0.1);
+            --bg: #0f0c29;
+            --sidebar: rgba(0,0,0,0.6);
+            --bubble-user: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            --bubble-bot: rgba(255,255,255,0.08);
+            --text: white;
+            --border: rgba(255,255,255,0.08);
         }
         
-        body.dark {
-            --bg-primary: linear-gradient(135deg, #0a0a0a, #1a1a2e, #16213e);
-            --sidebar-bg: rgba(0,0,0,0.7);
-            --message-bot: rgba(255,255,255,0.05);
-        }
+        body.dark { --bg: #0a0a0a; --sidebar: #0a0a0a; --bubble-bot: #1a1a1a; }
         
         body {
             font-family: 'Inter', sans-serif;
-            background: var(--bg-primary);
+            background: var(--bg);
+            color: var(--text);
             height: 100vh;
             overflow: hidden;
-            transition: background 0.3s ease;
+            transition: background 0.3s;
         }
         
-        /* Animated Background */
-        .animated-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; }
-        .orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: float 20s infinite ease; }
-        .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #8b5cf6, #4c1d95); top: -150px; left: -150px; }
-        .orb-2 { width: 600px; height: 600px; background: radial-gradient(circle, #ec4899, #be185d); bottom: -200px; right: -200px; animation-delay: -5s; }
-        .orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, #06b6d4, #0891b2); top: 50%; left: 50%; animation-delay: -10s; }
-        @keyframes float { 0%,100% { transform: translate(0,0) scale(1); } 33% { transform: translate(30px,-30px) scale(1.1); } 66% { transform: translate(-20px,20px) scale(0.9); } }
+        /* App Layout */
+        .app { display: flex; height: 100%; position: relative; }
         
-        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
-        .particle { position: absolute; background: rgba(255,255,255,0.2); border-radius: 50%; animation: particleFloat 15s infinite linear; }
-        @keyframes particleFloat { 0% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; } }
+        /* Sidebar (Drawer HP) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100%;
+            background: var(--sidebar);
+            backdrop-filter: blur(20px);
+            z-index: 100;
+            transition: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--border);
+        }
+        .sidebar.open { left: 0; }
         
-        .app-container { position: relative; z-index: 2; display: flex; height: 100vh; }
+        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border); }
+        .logo-small { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+        .logo-small i { font-size: 28px; color: #8b5cf6; }
+        .logo-small span { font-weight: 700; font-size: 18px; }
         
-        /* Sidebar */
-        .sidebar { width: 300px; background: var(--sidebar-bg); backdrop-filter: blur(20px); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; transition: all 0.3s ease; }
-        .sidebar-header { padding: 20px; border-bottom: 1px solid var(--border-color); }
-        .logo-area { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, #ffd89b, #c7e9fb); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #4c1d95; }
-        .logo-text h2 { color: white; font-size: 20px; }
-        .logo-text p { color: rgba(255,255,255,0.5); font-size: 11px; }
+        .new-chat-btn {
+            width: 100%; padding: 12px;
+            background: #8b5cf6; border: none;
+            border-radius: 30px; color: white;
+            font-weight: 600; display: flex;
+            align-items: center; justify-content: center;
+            gap: 8px; cursor: pointer;
+        }
         
-        .new-chat-btn { width: 100%; padding: 12px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: none; border-radius: 30px; color: white; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; }
-        .new-chat-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(139,92,246,0.4); }
-        .new-chat-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .search-box { padding: 12px 16px; background: rgba(255,255,255,0.05); margin: 12px; border-radius: 30px; display: flex; gap: 8px; }
+        .search-box input { background: none; border: none; color: white; width: 100%; outline: none; }
         
-        /* Search Bar */
-        .search-bar { padding: 10px 15px; margin: 10px; background: rgba(255,255,255,0.1); border-radius: 25px; display: flex; align-items: center; gap: 8px; }
-        .search-bar i { color: rgba(255,255,255,0.5); }
-        .search-bar input { background: none; border: none; color: white; width: 100%; outline: none; }
-        .search-bar input::placeholder { color: rgba(255,255,255,0.4); }
+        .folders { padding: 0 12px; margin-bottom: 12px; display: flex; gap: 8px; overflow-x: auto; }
+        .folder-btn { padding: 6px 14px; background: rgba(255,255,255,0.05); border-radius: 20px; font-size: 12px; white-space: nowrap; }
+        .folder-btn.active { background: #8b5cf6; }
         
-        .chats-list { flex: 1; overflow-y: auto; padding: 10px; }
-        .chat-item { padding: 12px; margin: 5px 0; border-radius: 12px; cursor: pointer; color: white; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s; }
-        .chat-item:hover { background: rgba(255,255,255,0.1); }
-        .chat-item.active { background: rgba(139,92,246,0.5); }
-        .chat-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
-        .pin-chat { margin-right: 8px; color: #f59e0b; font-size: 12px; }
-        .delete-chat { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 5px; display: none; }
-        .chat-item:hover .delete-chat { display: block; }
+        .chats-list { flex: 1; overflow-y: auto; padding: 0 12px; }
+        .chat-item {
+            padding: 14px; margin: 4px 0; border-radius: 16px;
+            display: flex; align-items: center; gap: 12px;
+            cursor: pointer; transition: 0.2s;
+        }
+        .chat-item.active { background: rgba(139,92,246,0.3); }
+        .chat-item .title { flex: 1; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pin-icon { color: #f59e0b; font-size: 12px; margin-right: 4px; }
+        .delete-chat { opacity: 0; transition: 0.2s; background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 6px; }
+        .chat-item:hover .delete-chat { opacity: 1; }
         
-        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border-color); }
-        .user-info { display: flex; align-items: center; gap: 12px; color: white; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #6d28d9; display: flex; align-items: center; justify-content: center; }
-        .user-name { flex: 1; font-size: 14px; overflow: hidden; text-overflow: ellipsis; }
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: #8b5cf6; display: flex; align-items: center; justify-content: center; }
+        .user-name { flex: 1; font-size: 14px; }
+        .logout-btn { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
         
         /* Main Chat */
-        .main-chat { flex: 1; display: flex; flex-direction: column; }
-        .chat-header { padding: 15px 25px; background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .header-left { display: flex; align-items: center; gap: 15px; }
-        .menu-toggle { display: none; background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
-        .current-chat-title { color: white; font-size: 18px; font-weight: 600; }
+        .main-chat { flex: 1; display: flex; flex-direction: column; width: 100%; }
         
-        /* Header Tools */
-        .header-tools { display: flex; gap: 10px; flex-wrap: wrap; }
-        .tool-btn { background: rgba(255,255,255,0.1); border: none; width: 35px; height: 35px; border-radius: 50%; color: white; cursor: pointer; transition: all 0.2s; }
-        .tool-btn:hover { background: rgba(139,92,246,0.5); transform: scale(1.05); }
+        .chat-header {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .menu-btn { background: none; border: none; color: white; font-size: 24px; cursor: pointer; }
+        .chat-title { flex: 1; font-weight: 600; font-size: 16px; }
+        .header-actions { display: flex; gap: 12px; }
+        .icon-btn { background: none; border: none; color: white; font-size: 18px; cursor: pointer; padding: 6px; }
         
-        /* Chat Messages */
-        .chat-messages { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 20px; }
-        .chat-messages::-webkit-scrollbar { width: 6px; }
-        .chat-messages::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
-        .chat-messages::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.3); border-radius: 10px; }
-        
-        .message { display: flex; gap: 15px; animation: slideIn 0.3s ease; position: relative; }
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .message.user { justify-content: flex-end; }
-        .message-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-        .message.user .message-avatar { background: linear-gradient(135deg, #8b5cf6, #6d28d9); order: 2; }
-        .message.bot .message-avatar { background: linear-gradient(135deg, #10b981, #059669); }
-        .message-content { max-width: 70%; position: relative; }
-        .message.user .message-content { order: 1; }
-        .message-bubble { padding: 12px 20px; border-radius: 20px; word-wrap: break-word; line-height: 1.5; position: relative; }
-        .message.user .message-bubble { background: var(--message-user); color: white; border-bottom-right-radius: 5px; }
-        .message.bot .message-bubble { background: var(--message-bot); color: white; border-bottom-left-radius: 5px; backdrop-filter: blur(10px); }
-        .message-time { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 5px; padding: 0 10px; }
-        
-        .message-actions { position: absolute; bottom: 0; right: 0; display: none; gap: 5px; background: rgba(0,0,0,0.5); border-radius: 15px; padding: 2px 8px; }
-        .message:hover .message-actions { display: flex; }
-        .message-action { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 12px; padding: 2px 5px; }
-        .message-action:hover { color: #8b5cf6; }
-        
-        .like-btn.liked { color: #10b981; }
-        .dislike-btn.disliked { color: #ef4444; }
-        
-        /* Input Area */
-        .chat-input-area { padding: 20px 30px; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); }
-        .input-wrapper { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
-        .upload-btn, .voice-btn, .settings-btn { width: 45px; height: 45px; background: rgba(139,92,246,0.2); border: 1px solid var(--border-color); border-radius: 50%; color: white; cursor: pointer; transition: all 0.3s; }
-        .upload-btn:hover, .voice-btn:hover, .settings-btn:hover { background: rgba(139,92,246,0.4); transform: scale(1.05); }
-        .chat-input { flex: 1; padding: 15px 20px; background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); border-radius: 30px; color: white; font-family: 'Inter', sans-serif; font-size: 15px; resize: none; }
-        .chat-input:focus { outline: none; border-color: #8b5cf6; }
-        .send-button { width: 50px; height: 50px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border: none; border-radius: 50%; color: white; cursor: pointer; transition: all 0.3s; }
-        .send-button:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(139,92,246,0.5); }
-        
-        .typing-indicator { display: flex; gap: 5px; padding: 12px 20px; background: rgba(255,255,255,0.1); border-radius: 20px; width: fit-content; }
-        .typing-indicator span { width: 8px; height: 8px; background: white; border-radius: 50%; animation: typing 1.4s infinite; }
-        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
-        @keyframes typing { 0%,60%,100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-10px); opacity: 1; } }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-content { background: rgba(0,0,0,0.95); backdrop-filter: blur(20px); border-radius: 30px; padding: 30px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid var(--border-color); }
-        .modal-content h3 { color: white; margin-bottom: 20px; }
-        .modal-close { float: right; font-size: 24px; cursor: pointer; color: white; }
-        
-        .settings-grid { display: grid; gap: 15px; }
-        .settings-item { display: flex; justify-content: space-between; align-items: center; color: white; padding: 10px 0; border-bottom: 1px solid var(--border-color); }
-        .settings-item select, .settings-item input { background: rgba(255,255,255,0.1); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; color: white; }
-        
-        .quick-reply-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-top: 15px; }
-        .quick-reply-btn { background: rgba(139,92,246,0.2); border: 1px solid var(--border-color); padding: 10px; border-radius: 15px; color: white; cursor: pointer; transition: all 0.2s; }
-        .quick-reply-btn:hover { background: rgba(139,92,246,0.5); }
-        
-        .todo-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; margin: 5px 0; }
-        .todo-checkbox { width: 20px; height: 20px; cursor: pointer; }
-        .todo-text { flex: 1; color: white; }
-        .todo-text.done { text-decoration: line-through; opacity: 0.5; }
-        .todo-delete { background: none; border: none; color: #ef4444; cursor: pointer; }
-        
-        .badge-container { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
-        .badge { background: linear-gradient(135deg, #f59e0b, #d97706); padding: 8px 15px; border-radius: 20px; color: white; font-size: 12px; display: flex; align-items: center; gap: 8px; }
-        .badge.locked { background: rgba(255,255,255,0.1); opacity: 0.5; }
-        
-        .streak-card { text-align: center; padding: 20px; background: linear-gradient(135deg, #8b5cf6, #6d28d9); border-radius: 20px; margin-bottom: 15px; }
-        .streak-number { font-size: 48px; font-weight: 700; }
-        
-        .upload-area { border: 2px dashed rgba(139,92,246,0.5); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 15px; }
-        .upload-area:hover { border-color: #8b5cf6; background: rgba(139,92,246,0.1); }
-        .file-preview { max-width: 100%; max-height: 150px; border-radius: 10px; margin-top: 10px; }
-        
-        @media (max-width: 768px) {
-            .sidebar { position: fixed; left: -300px; z-index: 100; height: 100%; background: rgba(0,0,0,0.95); width: 280px; }
-            .sidebar.open { left: 0; }
-            .menu-toggle { display: block; }
-            .message-content { max-width: 85%; }
-            .header-tools { order: 3; width: 100%; justify-content: center; }
+        /* Messages */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
         
-        .admin-btn { background: #ef4444; }
-        .admin-panel { background: rgba(0,0,0,0.95); border-radius: 20px; padding: 20px; margin-top: 20px; }
-        .stat-card { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 15px; text-align: center; }
-        .stat-number { font-size: 32px; font-weight: 700; color: #8b5cf6; }
+        .message {
+            display: flex;
+            gap: 10px;
+            max-width: 85%;
+            animation: fadeIn 0.2s ease;
+        }
+        .message.user { align-self: flex-end; flex-direction: row-reverse; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background: #8b5cf6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 16px; }
+        .message.user .avatar { background: #4c1d95; }
+        .bubble {
+            padding: 12px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+        .message.user .bubble { background: linear-gradient(135deg, #8b5cf6, #6d28d9); border-bottom-right-radius: 4px; }
+        .message.bot .bubble { background: var(--bubble-bot); border-bottom-left-radius: 4px; }
+        
+        .message-actions { display: flex; gap: 8px; margin-top: 6px; justify-content: flex-end; }
+        .msg-action { background: none; border: none; color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; }
+        
+        .time { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; padding: 0 4px; }
+        
+        /* Input Area */
+        .input-area {
+            padding: 12px 16px;
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border);
+        }
+        .input-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .input-actions { display: flex; gap: 8px; }
+        .input-btn {
+            width: 44px; height: 44px;
+            background: rgba(139,92,246,0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+        }
+        textarea {
+            flex: 1;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 12px 16px;
+            color: white;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            max-height: 100px;
+        }
+        textarea:focus { outline: none; border-color: #8b5cf6; }
+        .send-btn {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: rgba(0,0,0,0.95);
+            border-radius: 28px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 24px;
+        }
+        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 18px; font-weight: 600; }
+        .modal-close { font-size: 24px; cursor: pointer; }
+        
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .setting-item select, .setting-item input { background: rgba(255,255,255,0.1); border: none; padding: 8px 12px; border-radius: 20px; color: white; }
+        
+        .quick-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-top: 12px; }
+        .quick-btn { background: rgba(139,92,246,0.2); padding: 10px; border-radius: 20px; text-align: center; cursor: pointer; font-size: 13px; }
+        
+        .reminder-item { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 16px; margin: 8px 0; display: flex; justify-content: space-between; align-items: center; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-top: 16px; }
+        .stat-card { background: rgba(139,92,246,0.15); padding: 16px; border-radius: 20px; text-align: center; }
+        .stat-number { font-size: 28px; font-weight: 700; color: #8b5cf6; }
+        
+        .upload-area { border: 2px dashed rgba(139,92,246,0.5); border-radius: 20px; padding: 20px; text-align: center; cursor: pointer; margin: 16px 0; }
+        .image-preview { max-width: 100%; max-height: 150px; border-radius: 16px; margin-top: 10px; }
+        
+        .typing { display: flex; gap: 4px; padding: 12px 16px; background: var(--bubble-bot); border-radius: 20px; width: fit-content; }
+        .typing span { width: 8px; height: 8px; background: white; border-radius: 50%; animation: typing 1.4s infinite; }
+        @keyframes typing { 0%,60%,100% { transform: translateY(0); opacity: 0.5; } 30% { transform: translateY(-8px); opacity: 1; } }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        @media (min-width: 768px) {
+            .sidebar { position: relative; left: 0 !important; width: 300px; }
+            .menu-btn { display: none; }
+        }
     </style>
 </head>
 <body>
-    <div class="animated-bg"><div class="orb orb-1"></div><div class="orb orb-2"></div><div class="orb orb-3"></div></div>
-    <div class="particles" id="particles"></div>
+<div class="app">
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-small"><i class="fas fa-brain"></i><span>cYama AI</span></div>
+            <button class="new-chat-btn" id="newChatBtn"><i class="fas fa-plus"></i> Obrolan Baru</button>
+        </div>
+        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Cari chat..."></div>
+        <div class="folders" id="foldersContainer"></div>
+        <div class="chats-list" id="chatsList"></div>
+        <div class="sidebar-footer" id="sidebarFooter"></div>
+    </div>
     
-    <div class="app-container">
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-area">
-                    <div class="logo-icon"><i class="fas fa-brain"></i></div>
-                    <div class="logo-text"><h2>cYama AI</h2><p>Super AI</p></div>
-                </div>
-                <button class="new-chat-btn" id="newChatBtn"><i class="fas fa-plus"></i> Obrolan Baru</button>
+    <!-- Main Chat -->
+    <div class="main-chat">
+        <div class="chat-header">
+            <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
+            <div class="chat-title" id="chatTitle">cYama AI</div>
+            <div class="header-actions">
+                <button class="icon-btn" id="settingsBtn"><i class="fas fa-sliders-h"></i></button>
+                <button class="icon-btn" id="moreBtn"><i class="fas fa-ellipsis-v"></i></button>
             </div>
-            <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchChatInput" placeholder="Cari chat..."></div>
-            <div class="chats-list" id="chatsList"></div>
-            <div class="sidebar-footer" id="sidebarFooter"></div>
         </div>
         
-        <!-- Main Chat -->
-        <div class="main-chat">
-            <div class="chat-header">
-                <div class="header-left">
-                    <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
-                    <div class="current-chat-title" id="currentChatTitle">cYama AI</div>
+        <div class="messages" id="messages"></div>
+        
+        <div class="input-area">
+            <div class="input-wrapper">
+                <div class="input-actions">
+                    <button class="input-btn" id="uploadBtn"><i class="fas fa-image"></i></button>
+                    <button class="input-btn" id="voiceBtn"><i class="fas fa-microphone"></i></button>
                 </div>
-                <div class="header-tools">
-                    <button class="tool-btn" id="darkModeBtn" title="Dark/Light Mode"><i class="fas fa-moon"></i></button>
-                    <button class="tool-btn" id="fontSizeBtn" title="Font Size"><i class="fas fa-text-height"></i></button>
-                    <button class="tool-btn" id="exportChatBtn" title="Export Chat"><i class="fas fa-download"></i></button>
-                    <button class="tool-btn" id="shareChatBtn" title="Bagikan Chat"><i class="fas fa-share-alt"></i></button>
-                    <button class="tool-btn" id="screenshotBtn" title="Screenshot"><i class="fas fa-camera"></i></button>
-                    <button class="tool-btn" id="incognitoBtn" title="Incognito Mode"><i class="fas fa-user-secret"></i></button>
-                    <button class="tool-btn admin-btn" id="adminBtn" title="Admin Dashboard" style="display:none;"><i class="fas fa-chart-line"></i></button>
-                </div>
-            </div>
-            
-            <div class="chat-messages" id="chatMessages"></div>
-            
-            <div class="chat-input-area">
-                <div class="input-wrapper">
-                    <button class="upload-btn" id="uploadBtn" title="Upload Gambar"><i class="fas fa-paperclip"></i></button>
-                    <button class="voice-btn" id="voiceBtn" title="Voice Input"><i class="fas fa-microphone"></i></button>
-                    <button class="settings-btn" id="settingsBtn" title="Pengaturan"><i class="fas fa-sliders-h"></i></button>
-                    <textarea class="chat-input" id="messageInput" placeholder="Ketik pesan... (Enter kirim)" rows="1"></textarea>
-                    <button class="send-button" id="sendButton"><i class="fas fa-paper-plane"></i></button>
-                </div>
+                <textarea id="messageInput" placeholder="Ketik pesan... (Enter kirim)" rows="1"></textarea>
+                <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
             </div>
         </div>
     </div>
-    
-    <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('settingsModal')">&times;</span>
-            <h3><i class="fas fa-sliders-h"></i> Pengaturan</h3>
-            <div class="settings-grid">
-                <div class="settings-item"><span>🤖 AI Personality</span><select id="personalitySelect"><option value="formal">Formal</option><option value="santai">Santai</option><option value="lucu">Lucu</option></select></div>
-                <div class="settings-item"><span>🎨 Custom Background</span><input type="color" id="bgColorPicker" value="#0f0c29"></div>
-                <div class="settings-item"><span>📝 Font Size</span><input type="range" id="fontSizeRange" min="12" max="20" value="14"></div>
-                <div class="settings-item"><span>🗑️ Auto Delete Chat</span><select id="autoDeleteSelect"><option value="0">Tidak pernah</option><option value="7">7 hari</option><option value="30">30 hari</option></select></div>
-                <div class="settings-item"><span>🔒 PIN Lock</span><button id="setPinBtn" style="background:#8b5cf6;border:none;padding:5px 10px;border-radius:10px;color:white;cursor:pointer;">Set PIN</button></div>
-            </div>
-            <h3 style="margin-top:20px;"><i class="fas fa-bolt"></i> Quick Reply</h3>
-            <div class="quick-reply-grid" id="quickReplyGrid"></div>
-        </div>
-    </div>
-    
-    <!-- Upload Modal -->
-    <div class="modal" id="uploadModal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('uploadModal')">&times;</span>
-            <h3><i class="fas fa-image"></i> Upload Gambar</h3>
-            <div class="upload-area" id="uploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Klik atau drag & drop gambar</p><input type="file" id="fileInput" accept="image/*" style="display:none;"></div>
-            <div id="previewContainer"></div>
-            <textarea class="chat-input" id="imageQuery" placeholder="Tanya tentang gambar ini..." rows="2" style="margin:10px 0;"></textarea>
-            <button class="new-chat-btn" id="sendFileBtn" style="margin-top:10px;"><i class="fas fa-paper-plane"></i> Kirim</button>
-        </div>
-    </div>
-    
-    <!-- Share Modal -->
-    <div class="modal" id="shareModal">
-        <div class="modal-content">
-            <span class="modal-close" onclick="closeModal('shareModal')">&times;</span>
-            <h3><i class="fas fa-share-alt"></i> Bagikan Chat</h3>
-            <button class="new-chat-btn" onclick="shareToWhatsApp()" style="margin:10px 0;"><i class="fab fa-whatsapp"></i> WhatsApp</button>
-            <button class="new-chat-btn" onclick="shareToTwitter()" style="margin:10px 0;background:#1DA1F2;"><i class="fab fa-twitter"></i> Twitter</button>
-        </div>
-    </div>
-    
-    <!-- Admin Modal -->
-    <div class="modal" id="adminModal">
-        <div class="modal-content" style="max-width:700px;">
-            <span class="modal-close" onclick="closeModal('adminModal')">&times;</span>
-            <h3><i class="fas fa-chart-line"></i> Admin Dashboard</h3>
-            <div class="admin-panel" id="adminPanel"></div>
-        </div>
-    </div>
+</div>
 
-    <script>
-        // ============ PARTIKEL ============
-        function createParticles(){for(let i=0;i<50;i++){let p=document.createElement('div');p.classList.add('particle');p.style.width=Math.random()*4+1+'px';p.style.height=p.style.width;p.style.left=Math.random()*100+'%';p.style.animationDelay=Math.random()*15+'s';p.style.animationDuration=Math.random()*10+8+'s';document.getElementById('particles').appendChild(p);}}
-        createParticles();
-        
-        // ============ DATA ============
-        let auth=localStorage.getItem('cyama_auth');
-        let userData=JSON.parse(localStorage.getItem('cyama_user')||'{}');
-        let isGuest=auth!=='true';
-        let currentChatId=null;
-        let chats={};
-        let isTyping=false;
-        let streak=parseInt(localStorage.getItem('cyama_streak')||'0');
-        let lastChatDate=localStorage.getItem('cyama_last_chat');
-        let incognito=false;
-        let ratings={};
-        
-        // DOM Elements
-        const chatMessagesDiv=document.getElementById('chatMessages');
-        const messageInput=document.getElementById('messageInput');
-        const sendButton=document.getElementById('sendButton');
-        const chatsList=document.getElementById('chatsList');
-        const newChatBtn=document.getElementById('newChatBtn');
-        const searchInput=document.getElementById('searchChatInput');
-        
-        // ============ STREAK ============
-        function updateStreak(){
-            let today=new Date().toDateString();
-            if(lastChatDate!==today){
-                if(lastChatDate){
-                    let last=new Date(lastChatDate);
-                    let diff=(new Date()-last)/(1000*3600*24);
-                    if(diff===1)streak++;
-                    else if(diff>1)streak=1;
-                }else streak=1;
-                localStorage.setItem('cyama_streak',streak);
-                localStorage.setItem('cyama_last_chat',today);
-            }
+<!-- Modal Settings -->
+<div class="modal" id="settingsModal">
+    <div class="modal-content">
+        <div class="modal-header"><span>⚙️ Pengaturan</span><span class="modal-close" onclick="closeModal('settingsModal')">&times;</span></div>
+        <div class="setting-item"><span>🤖 Personality</span><select id="personality"><option value="formal">Formal</option><option value="santai">Santai</option><option value="lucu">Lucu</option></select></div>
+        <div class="setting-item"><span>🌙 Dark Mode</span><input type="checkbox" id="darkModeToggle"></div>
+        <div class="setting-item"><span>🎨 Background</span><input type="color" id="bgColor" value="#0f0c29"></div>
+        <div class="setting-item"><span>📁 Folder</span><select id="folderSelect"><option value="all">Semua</option><option value="work">Work</option><option value="personal">Personal</option></select></div>
+        <div class="setting-item"><span>🗑️ Incognito</span><input type="checkbox" id="incognitoToggle"></div>
+        <div><button class="new-chat-btn" id="exportChatBtn" style="margin-top:16px;">📥 Export Chat</button></div>
+    </div>
+    <div style="margin-top:20px;"><h4>⚡ Quick Reply</h4><div class="quick-grid" id="quickGrid"></div></div>
+    <div style="margin-top:20px;"><h4>⏰ Reminder</h4><input type="text" id="reminderText" placeholder="Apa yang ingin diingatkan?" style="width:100%; padding:10px; border-radius:20px; background:rgba(255,255,255,0.1); border:none; color:white;"><button class="new-chat-btn" id="addReminderBtn" style="margin-top:8px;">Tambah Reminder</button><div id="reminderList"></div></div>
+    <div style="margin-top:20px;"><h4>📊 Statistik</h4><div class="stats-grid" id="statsContainer"></div></div>
+</div>
+
+<!-- Upload Modal -->
+<div class="modal" id="uploadModal">
+    <div class="modal-content">
+        <div class="modal-header"><span>📷 Upload Gambar</span><span class="modal-close" onclick="closeModal('uploadModal')">&times;</span></div>
+        <div class="upload-area" id="uploadArea"><i class="fas fa-cloud-upload-alt"></i><p>Klik untuk pilih gambar</p><input type="file" id="fileInput" accept="image/*" style="display:none;"></div>
+        <div id="imagePreview"></div>
+        <textarea id="imageQuestion" placeholder="Tanya tentang gambar ini..." style="width:100%; padding:12px; border-radius:20px; background:rgba(255,255,255,0.1); border:none; color:white; margin:12px 0;"></textarea>
+        <button class="new-chat-btn" id="processImageBtn">Kirim & Deskripsikan</button>
+    </div>
+</div>
+
+<!-- More Menu Modal -->
+<div class="modal" id="moreModal">
+    <div class="modal-content">
+        <div class="modal-header"><span>📋 Menu</span><span class="modal-close" onclick="closeModal('moreModal')">&times;</span></div>
+        <button class="new-chat-btn" id="shareChatBtn" style="margin-bottom:10px;"><i class="fab fa-whatsapp"></i> Bagikan Chat</button>
+        <button class="new-chat-btn" id="statsBtn" style="margin-bottom:10px; background:#10b981;"><i class="fas fa-chart-line"></i> Lihat Statistik</button>
+        <button class="new-chat-btn" id="clearAllBtn" style="background:#ef4444;"><i class="fas fa-trash"></i> Hapus Semua Chat</button>
+    </div>
+</div>
+
+<script>
+    // ============ INIT ============
+    let auth = localStorage.getItem('cyama_auth');
+    let user = JSON.parse(localStorage.getItem('cyama_user') || '{}');
+    let isGuest = auth !== 'true';
+    if (!auth && auth !== 'guest') window.location.href = '/';
+    
+    let currentChatId = null;
+    let chats = {};
+    let folders = { work: [], personal: [], all: [] };
+    let reminders = JSON.parse(localStorage.getItem('cyama_reminders') || '[]');
+    let streak = parseInt(localStorage.getItem('cyama_streak') || '0');
+    let lastChatDate = localStorage.getItem('cyama_last_chat');
+    let incognito = false;
+    let selectedImage = null;
+    
+    // DOM
+    const messagesDiv = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const chatsList = document.getElementById('chatsList');
+    const chatTitle = document.getElementById('chatTitle');
+    
+    // Helper
+    function escapeHtml(text) { let d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+    function scrollToBottom() { messagesDiv.scrollTop = messagesDiv.scrollHeight; }
+    
+    function storageKey() { return isGuest ? 'cyama_chats_guest' : `cyama_chats_${user.email || 'user'}`; }
+    function saveChats() { localStorage.setItem(storageKey(), JSON.stringify(chats)); }
+    
+    function updateStreak() {
+        let today = new Date().toDateString();
+        if (lastChatDate !== today) {
+            if (lastChatDate) streak = (new Date() - new Date(lastChatDate)) / (1000*3600*24) === 1 ? streak + 1 : 1;
+            else streak = 1;
+            localStorage.setItem('cyama_streak', streak);
+            localStorage.setItem('cyama_last_chat', today);
         }
+    }
+    
+    // Chat Management
+    function loadChats() {
+        let stored = localStorage.getItem(storageKey());
+        if (stored) chats = JSON.parse(stored);
+        else chats = {};
+        if (Object.keys(chats).length === 0) createNewChat();
+        else selectChat(Object.keys(chats)[0]);
+        renderChatsList();
+    }
+    
+    function createNewChat() {
+        if (isGuest && Object.keys(chats).length >= 3) { alert('Tamu maksimal 3 chat. Login untuk unlimited.'); return null; }
+        let id = Date.now().toString();
+        let folder = document.getElementById('folderSelect')?.value || 'all';
+        chats[id] = { id, title: 'Chat Baru', messages: [], folder: folder === 'all' ? 'personal' : folder, pinned: false, created: Date.now() };
+        saveChats(); renderChatsList(); selectChat(id);
+        return id;
+    }
+    
+    function deleteChat(id) { delete chats[id]; saveChats(); if (Object.keys(chats).length === 0) createNewChat(); else selectChat(Object.keys(chats)[0]); renderChatsList(); }
+    function pinChat(id) { chats[id].pinned = !chats[id].pinned; saveChats(); renderChatsList(); }
+    function updateChatTitle(id, msg) { let title = msg.substring(0, 25) + (msg.length > 25 ? '...' : ''); chats[id].title = title; saveChats(); renderChatsList(); if (currentChatId === id) chatTitle.innerText = title; }
+    
+    function selectChat(id) {
+        currentChatId = id; let chat = chats[id];
+        if (chat) { chatTitle.innerText = chat.title; renderMessages(chat.messages); renderChatsList(); }
+    }
+    
+    function renderChatsList() {
+        let container = chatsList; container.innerHTML = '';
+        let search = document.getElementById('searchInput')?.value.toLowerCase() || '';
+        let folder = document.getElementById('folderSelect')?.value || 'all';
+        let filtered = Object.values(chats).filter(c => (folder === 'all' || c.folder === folder) && c.title.toLowerCase().includes(search));
+        filtered.sort((a,b) => (b.pinned - a.pinned) || (b.created - a.created));
+        filtered.forEach(c => { let div = document.createElement('div'); div.className = `chat-item ${currentChatId === c.id ? 'active' : ''}`;
+            div.innerHTML = `${c.pinned ? '<i class="fas fa-thumbtack pin-icon"></i>' : ''}<div class="title">${escapeHtml(c.title)}</div><button class="delete-chat" onclick="event.stopPropagation();deleteChat('${c.id}')"><i class="fas fa-trash"></i></button><button class="delete-chat" onclick="event.stopPropagation();pinChat('${c.id}')"><i class="fas fa-thumbtack"></i></button>`;
+            div.onclick = () => selectChat(c.id); container.appendChild(div); });
+    }
+    
+    function renderMessages(messages) {
+        messagesDiv.innerHTML = '';
+        if (!messages || messages.length === 0) { messagesDiv.innerHTML = '<div class="message bot"><div class="avatar"><i class="fas fa-robot"></i></div><div class="bubble">Halo! Saya cYama AI. Ada yang bisa saya bantu? 😊</div></div>'; return; }
+        messages.forEach((msg, idx) => { let div = document.createElement('div'); div.className = `message ${msg.role}`;
+            div.innerHTML = `<div class="avatar"><i class="fas ${msg.role === 'user' ? 'fa-user' : 'fa-robot'}"></i></div><div><div class="bubble">${escapeHtml(msg.content)}</div><div class="message-actions"><button class="msg-action" onclick="copyText('${escapeHtml(msg.content).replace(/'/g, "\\'")}')"><i class="fas fa-copy"></i> Salin</button><button class="msg-action" onclick="speakText('${escapeHtml(msg.content).replace(/'/g, "\\'")}')"><i class="fas fa-volume-up"></i> Suara</button></div><div class="time">${msg.time || ''}</div></div>`;
+            messagesDiv.appendChild(div); });
+        scrollToBottom();
+    }
+    
+    function addMessage(role, content) {
+        if (incognito) { messagesDiv.innerHTML += `<div class="message ${role}"><div class="avatar"><i class="fas ${role === 'user' ? 'fa-user' : 'fa-robot'}"></i></div><div><div class="bubble">${escapeHtml(content)}</div></div></div>`; scrollToBottom(); return; }
+        let chat = chats[currentChatId]; if (!chat) return;
+        let msg = { role, content, time: new Date().toLocaleTimeString('id-ID', { hour:'2-digit', minute:'2-digit' }) };
+        chat.messages.push(msg);
+        if (role === 'user' && chat.messages.length === 1) updateChatTitle(currentChatId, content);
+        saveChats(); renderMessages(chat.messages);
+        if (role === 'user') updateStreak();
+    }
+    
+    // API
+    async function sendToAI(message, imageBase64 = null) {
+        let personality = localStorage.getItem('cyama_personality') || 'formal';
+        try {
+            let body = { message, personality };
+            if (imageBase64) body.image = imageBase64;
+            let res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+            let data = await res.json();
+            return data.success ? data.reply : `⚠️ ${data.error || 'Error'}`;
+        } catch(e) { return `⚠️ ${e.message}`; }
+    }
+    
+    async function sendMessage() {
+        let msg = messageInput.value.trim();
+        if (!msg && !selectedImage) return;
+        let draft = msg; messageInput.value = ''; messageInput.style.height = 'auto';
+        addMessage('user', msg || (selectedImage ? '[Mengirim gambar]' : ''));
         
-        // ============ BADGES ============
-        let badges=[
-            {id:'first_chat',name:'First Chat',icon:'fas fa-star',condition:()=>getTotalMessages()>=1},
-            {id:'streak_7',name:'7 Day Streak',icon:'fas fa-fire',condition:()=>streak>=7},
-            {id:'streak_30',name:'30 Day Streak',icon:'fas fa-dragon',condition:()=>streak>=30},
-            {id:'master',name:'Chat Master',icon:'fas fa-crown',condition:()=>getTotalMessages()>=100},
-            {id:'image_master',name:'Image Master',icon:'fas fa-image',condition:()=>parseInt(localStorage.getItem('cyama_images_uploaded')||'0')>=5}
-        ];
-        
-        function getTotalMessages(){
-            let total=0;
-            Object.values(chats).forEach(chat=>total+=chat.messages.length);
-            return total;
+        showTyping();
+        let reply;
+        if (selectedImage) {
+            reply = await sendToAI(document.getElementById('imageQuestion').value || 'Deskripsikan gambar ini', selectedImage);
+            selectedImage = null; document.getElementById('imagePreview').innerHTML = ''; closeModal('uploadModal');
+        } else {
+            reply = await sendToAI(msg);
         }
-        
-        function checkBadges(){
-            let earned=JSON.parse(localStorage.getItem('cyama_badges')||'[]');
-            badges.forEach(b=>{if(b.condition()&&!earned.includes(b.id))earned.push(b.id);});
-            localStorage.setItem('cyama_badges',JSON.stringify(earned));
-        }
-        
-        function renderBadges(){
-            let earned=JSON.parse(localStorage.getItem('cyama_badges')||'[]');
-            let container=document.getElementById('badgeContainer');
-            if(!container)return;
-            container.innerHTML='';
-            badges.forEach(b=>{let d=earned.includes(b.id);container.innerHTML+=`<div class="badge ${d?'':'locked'}"><i class="${b.icon}"></i> ${b.name}${!d?' 🔒':''}</div>`;});
-        }
-        
-        // ============ STORAGE ============
-        function storageKey(){return isGuest?`cyama_chats_guest`:`cyama_chats_${userData.email||'user'}`;}
-        function saveChats(){localStorage.setItem(storageKey(),JSON.stringify(chats));}
-        function loadChats(){
-            let stored=localStorage.getItem(storageKey());
-            if(stored)chats=JSON.parse(stored);
-            else chats={};
-            if(Object.keys(chats).length===0)createNewChat();
-            else selectChat(Object.keys(chats)[0]);
-            renderChatsList();
-        }
-        
-        function createNewChat(){
-            if(isGuest){alert('Login untuk membuat obrolan baru!');return null;}
-            let id=Date.now().toString();
-            chats[id]={id:id,title:'Obrolan Baru',messages:[],pinned:false,createdAt:new Date().toISOString()};
-            saveChats();renderChatsList();selectChat(id);return id;
-        }
-        
-        function deleteChat(id){
-            if(isGuest){alert('Login untuk menghapus obrolan!');return;}
-            if(confirm('Hapus obrolan ini?')){delete chats[id];saveChats();if(Object.keys(chats).length===0)createNewChat();else selectChat(Object.keys(chats)[0]);renderChatsList();}
-        }
-        
-        function pinChat(id){chats[id].pinned=!chats[id].pinned;saveChats();renderChatsList();}
-        
-        function selectChat(id){currentChatId=id;let chat=chats[id];if(chat){document.getElementById('currentChatTitle').innerText=chat.title;renderMessages(chat.messages);renderChatsList();}}
-        
-        function searchChats(){
-            let query=searchInput.value.toLowerCase();
-            if(!query){renderChatsList();return;}
-            let filtered=Object.values(chats).filter(c=>c.title.toLowerCase().includes(query));
-            chatsList.innerHTML='';
-            filtered.forEach(c=>{let div=document.createElement('div');div.className=`chat-item ${currentChatId===c.id?'active':''}`;div.innerHTML=`<div class="chat-title">${escapeHtml(c.title)}</div>`;div.onclick=()=>selectChat(c.id);chatsList.appendChild(div);});
-        }
-        
-        function updateChatTitle(id,msg){let title=msg.substring(0,30)+(msg.length>30?'...':'');if(chats[id]){chats[id].title=title;saveChats();renderChatsList();if(currentChatId===id)document.getElementById('currentChatTitle').innerText=title;}}
-        
-        function renderChatsList(){
-            let container=chatsList;container.innerHTML='';
-            let sorted=Object.values(chats).sort((a,b)=>(b.pinned?1:0)-(a.pinned?1:0));
-            sorted.forEach(c=>{let div=document.createElement('div');div.className=`chat-item ${currentChatId===c.id?'active':''}`;div.innerHTML=`${c.pinned?'<i class="fas fa-thumbtack pin-chat"></i>':''}<div class="chat-title">${escapeHtml(c.title)}</div>${!isGuest?`<button class="delete-chat" onclick="event.stopPropagation();deleteChat('${c.id}')"><i class="fas fa-trash"></i></button><button class="delete-chat" onclick="event.stopPropagation();pinChat('${c.id}')" style="margin-right:5px;"><i class="fas fa-thumbtack"></i></button>`:''}`;div.onclick=(e)=>{if(e.target.closest('.delete-chat'))return;selectChat(c.id);};container.appendChild(div);});
-        }
-        
-        function renderMessages(messages){
-            chatMessagesDiv.innerHTML='';
-            if(!messages||messages.length===0){chatMessagesDiv.innerHTML='<div class="message bot"><div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><div class="message-bubble">Halo! Saya cYama AI. Ada yang bisa saya bantu? 😊</div></div></div>';return;}
-            messages.forEach((msg,idx)=>{let div=document.createElement('div');div.className=`message ${msg.role}`;div.innerHTML=`<div class="message-avatar"><i class="fas ${msg.role==='user'?'fa-user':'fa-robot'}"></i></div><div class="message-content"><div class="message-bubble">${escapeHtml(msg.content)}</div><div class="message-time">${msg.time||''}</div><div class="message-actions"><button class="message-action copy-msg" data-msg="${escapeHtml(msg.content)}"><i class="fas fa-copy"></i></button><button class="message-action like-btn ${ratings[msg.id]?.like?'liked':''}" data-id="${msg.id}"><i class="fas fa-thumbs-up"></i></button><button class="message-action dislike-btn ${ratings[msg.id]?.dislike?'disliked':''}" data-id="${msg.id}"><i class="fas fa-thumbs-down"></i></button></div></div>`;chatMessagesDiv.appendChild(div);});
-            document.querySelectorAll('.copy-msg').forEach(btn=>btn.addEventListener('click',()=>{navigator.clipboard.writeText(btn.dataset.msg);alert('Pesan disalin!');}));
-            document.querySelectorAll('.like-btn').forEach(btn=>btn.addEventListener('click',function(){let id=this.dataset.id;ratings[id]={like:true,dislike:false};localStorage.setItem('cyama_ratings',JSON.stringify(ratings));renderMessages(messages);}));
-            document.querySelectorAll('.dislike-btn').forEach(btn=>btn.addEventListener('click',function(){let id=this.dataset.id;ratings[id]={like:false,dislike:true};localStorage.setItem('cyama_ratings',JSON.stringify(ratings));renderMessages(messages);}));
-            scrollToBottom();
-        }
-        
-        function addMessage(role,content){
-            if(incognito){chatMessagesDiv.innerHTML+=`<div class="message ${role}"><div class="message-avatar"><i class="fas ${role==='user'?'fa-user':'fa-robot'}"></i></div><div class="message-content"><div class="message-bubble">${escapeHtml(content)}</div></div></div>`;scrollToBottom();return;}
-            let chat=chats[currentChatId];if(!chat)return;
-            let msg={id:Date.now()+Math.random(),role:role,content:content,time:new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'})};
-            chat.messages.push(msg);
-            if(role==='user'&&chat.messages.length===1)updateChatTitle(currentChatId,content);
-            saveChats();renderMessages(chat.messages);
-            if(role==='user')updateStreak();checkBadges();
-        }
-        
-        // ============ API ============
-        async function sendToAPI(msg){
-            try{
-                let personality=localStorage.getItem('cyama_personality')||'formal';
-                let personalityMap={formal:'Jawab dengan formal dan profesional',santai:'Jawab dengan santai dan ramah',lucu:'Jawab dengan lucu dan menghibur'};
-                let res=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:`${personalityMap[personality]}. User: ${msg}`})});
-                let data=await res.json();
-                return data.reply||data.error||'Maaf, ada kesalahan.';
-            }catch(e){return `Error: ${e.message}`;}
-        }
-        
-        async function sendMessage(){
-            let msg=messageInput.value.trim();
-            if(!msg||isTyping)return;
-            addMessage('user',msg);
-            messageInput.value='';messageInput.style.height='auto';
-            showTyping();isTyping=true;sendButton.disabled=true;
-            let reply=await sendToAPI(msg);
-            removeTyping();addMessage('bot',reply);
-            isTyping=false;sendButton.disabled=false;
-        }
-        
-        // ============ VOICE & TEXT TO SPEECH ============
-        let recognition=null;
-        if('webkitSpeechRecognition' in window){recognition=new webkitSpeechRecognition();recognition.lang='id-ID';recognition.continuous=false;recognition.interimResults=false;}
-        document.getElementById('voiceBtn').onclick=()=>{if(recognition){recognition.start();recognition.onresult=(e)=>{messageInput.value=e.results[0][0].transcript;};recognition.onerror=()=>alert('Mic tidak tersedia');}else alert('Voice tidak support');};
-        
-        function speakText(text){let utterance=new SpeechSynthesisUtterance(text);utterance.lang='id-ID';window.speechSynthesis.speak(utterance);}
-        
-        // ============ EXPORT & SHARE ============
-        function exportChat(){
-            let chat=chats[currentChatId];if(!chat||chat.messages.length===0)return;
-            let content=`cYama AI Chat Export\nDate: ${new Date().toLocaleString()}\n\n`;
-            chat.messages.forEach(m=>{content+=`${m.role==='user'?'User':'cYama AI'} (${m.time}):\n${m.content}\n\n`;});
-            let blob=new Blob([content],{type:'text/plain'});let a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`chat_${currentChatId}.txt`;a.click();
-        }
-        
-        function shareToWhatsApp(){let text=encodeURIComponent(`Check out my chat on cYama AI!\n\n${window.location.href}`);window.open(`https://wa.me/?text=${text}`,'_blank');}
-        function shareToTwitter(){let text=encodeURIComponent(`Check out my chat on cYama AI!`);window.open(`https://twitter.com/intent/tweet?text=${text}`,'_blank');}
-        
-        async function screenshotChat(){let node=chatMessagesDiv;html2canvas(node).then(canvas=>{let link=document.createElement('a');link.download='chat_screenshot.png';link.href=canvas.toDataURL();link.click();});}
-        
-        // ============ AUTO DELETE ============
-        function autoDelete(){
-            let days=parseInt(localStorage.getItem('cyama_auto_delete')||'0');
-            if(days===0)return;
-            let deleted=false;Object.values(chats).forEach(chat=>{let created=new Date(chat.createdAt);let diff=(new Date()-created)/(1000*3600*24);if(diff>=days){delete chats[chat.id];deleted=true;}});
-            if(deleted){saveChats();if(Object.keys(chats).length===0)createNewChat();else selectChat(Object.keys(chats)[0]);renderChatsList();}
-        }
-        
-        // ============ UI ============
-        function showTyping(){let d=document.createElement('div');d.id='typing';d.className='message bot';d.innerHTML='<div class="message-avatar"><i class="fas fa-robot"></i></div><div class="message-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div>';chatMessagesDiv.appendChild(d);scrollToBottom();}
-        function removeTyping(){let t=document.getElementById('typing');if(t)t.remove();}
-        function scrollToBottom(){chatMessagesDiv.scrollTop=chatMessagesDiv.scrollHeight;}
-        function escapeHtml(t){let d=document.createElement('div');d.textContent=t;return d.innerHTML;}
-        function closeModal(id){document.getElementById(id).style.display='none';}
-        
-        // ============ SETTINGS ============
-        document.getElementById('settingsBtn').onclick=()=>{renderBadges();document.getElementById('settingsModal').style.display='flex';};
-        document.getElementById('personalitySelect').onchange=(e)=>localStorage.setItem('cyama_personality',e.target.value);
-        document.getElementById('bgColorPicker').onchange=(e)=>document.body.style.background=e.target.value;
-        document.getElementById('fontSizeRange').onchange=(e)=>chatMessagesDiv.style.fontSize=e.target.value+'px';
-        document.getElementById('autoDeleteSelect').onchange=(e)=>{localStorage.setItem('cyama_auto_delete',e.target.value);autoDelete();};
-        document.getElementById('setPinBtn').onclick=()=>{let pin=prompt('Set PIN (4 digit)');if(pin)localStorage.setItem('cyama_pin',pin);alert('PIN tersimpan!');};
-        
-        let quickReplies=['Terima kasih!','Bisa jelaskan lebih detail?','Tolong ringkas.','Contoh?','Mantap!','Lanjutkan.'];
-        function renderQuickReplies(){let grid=document.getElementById('quickReplyGrid');grid.innerHTML='';quickReplies.forEach(q=>{let btn=document.createElement('button');btn.className='quick-reply-btn';btn.innerText=q;btn.onclick=()=>{messageInput.value=q;sendMessage();closeModal('settingsModal');};grid.appendChild(btn);});}
-        renderQuickReplies();
-        
-        // Dark Mode
-        let darkMode=false;
-        document.getElementById('darkModeBtn').onclick=()=>{darkMode=!darkMode;if(darkMode)document.body.classList.add('dark');else document.body.classList.remove('dark');};
-        
-        document.getElementById('exportChatBtn').onclick=exportChat;
-        document.getElementById('shareChatBtn').onclick=()=>document.getElementById('shareModal').style.display='flex';
-        document.getElementById('screenshotBtn').onclick=()=>{if(typeof html2canvas!=='undefined')alert('Tunggu load library');else screenshotChat();};
-        
-        let incognitoActive=false;
-        document.getElementById('incognitoBtn').onclick=()=>{incognitoActive=!incognitoActive;alert(incognitoActive?'Mode Incognito AKTIF (chat tidak tersimpan)':'Mode Incognito NONAKTIF');incognito=incognitoActive;};
-        
-        // Upload Image
-        let selectedFile=null;
-        document.getElementById('uploadBtn').onclick=()=>document.getElementById('uploadModal').style.display='flex';
-        document.getElementById('uploadArea').onclick=()=>document.getElementById('fileInput').click();
-        document.getElementById('fileInput').onchange=(e)=>{if(e.target.files[0])selectedFile=e.target.files[0];let reader=new FileReader();reader.onload=(ev)=>{document.getElementById('previewContainer').innerHTML=`<img src="${ev.target.result}" class="file-preview">`;};reader.readAsDataURL(selectedFile);};
-        document.getElementById('sendFileBtn').onclick=async()=>{if(!selectedFile){alert('Pilih gambar');return;}let formData=new FormData();formData.append('image',selectedFile);formData.append('query',document.getElementById('imageQuery').value||'Deskripsikan gambar ini');showTyping();let res=await fetch('/api/upload',{method:'POST',body:formData});let data=await res.json();removeTyping();if(data.description){addMessage('bot',`🖼️ **Deskripsi Gambar:**\n\n${data.description}`);let uploaded=parseInt(localStorage.getItem('cyama_images_uploaded')||'0');localStorage.setItem('cyama_images_uploaded',uploaded+1);}else addMessage('bot',`⚠️ Gagal: ${data.error}`);closeModal('uploadModal');selectedFile=null;document.getElementById('previewContainer').innerHTML='';document.getElementById('fileInput').value='';};
-        
-        // Admin Dashboard
-        let adminEmail='yusufhisyamaa@gmail.com';
-        if(userData.email===adminEmail)document.getElementById('adminBtn').style.display='block';
-        document.getElementById('adminBtn').onclick=()=>{let totalChats=Object.keys(chats).length;let totalMsgs=getTotalMessages();let totalUsers=1;document.getElementById('adminPanel').innerHTML=`<div class="stat-card"><div class="stat-number">${totalChats}</div><div>Total Chats</div></div><div class="stat-card"><div class="stat-number">${totalMsgs}</div><div>Total Messages</div></div><div class="stat-card"><div class="stat-number">${streak}</div><div>Current Streak</div></div><div class="stat-card"><div class="stat-number">${localStorage.getItem('cyama_images_uploaded')||0}</div><div>Images Uploaded</div></div>`;document.getElementById('adminModal').style.display='flex';};
-        
-        // ============ INIT ============
-        if(!auth&&auth!=='guest')window.location.href='/';
-        let storedRating=localStorage.getItem('cyama_ratings');if(storedRating)ratings=JSON.parse(storedRating);
-        document.getElementById('sidebarFooter').innerHTML=isGuest?`<div class="user-info"><div class="user-avatar"><i class="fas fa-user"></i></div><div class="user-name">Tamu</div><button class="tool-btn" onclick="localStorage.clear();location.reload()"><i class="fas fa-sign-out-alt"></i></button></div>`:`<div class="user-info"><img class="user-avatar" src="${userData.picture||'https://ui-avatars.com/api/?background=8b5cf6&color=fff&name='+encodeURIComponent(userData.name)}" onerror="this.style.display='none'"><div class="user-name">${escapeHtml(userData.name||'User')}</div><button class="tool-btn" onclick="localStorage.clear();location.reload()"><i class="fas fa-sign-out-alt"></i></button></div>`;
-        loadChats();autoDelete();messageInput.focus();
-        messageInput.onkeypress=(e)=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}};
-        messageInput.oninput=function(){this.style.height='auto';this.style.height=Math.min(this.scrollHeight,120)+'px';};
-        newChatBtn.onclick=createNewChat;sendButton.onclick=sendMessage;searchInput.oninput=searchChats;
-        document.getElementById('menuToggle').onclick=()=>document.getElementById('sidebar').classList.toggle('open');
-        
-        // Speech button for bot replies
-        document.addEventListener('click',(e)=>{if(e.target.closest('.fa-volume-up')||e.target.closest('.speech-btn')){let msg=e.target.closest('.message-bubble')?.innerText;if(msg)speakText(msg);}});
-    </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+        removeTyping();
+        addMessage('bot', reply);
+    }
+    
+    // Voice
+    let recognition = null;
+    if ('webkitSpeechRecognition' in window) { recognition = new webkitSpeechRecognition(); recognition.lang = 'id-ID'; }
+    document.getElementById('voiceBtn').onclick = () => { if (recognition) { recognition.start(); recognition.onresult = (e) => { messageInput.value = e.results[0][0].transcript; }; } else alert('Voice tidak support'); };
+    
+    function speakText(text) { let utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'id-ID'; window.speechSynthesis.speak(utterance); }
+    window.speakText = speakText;
+    window.copyText = (text) => { navigator.clipboard.writeText(text); alert('Disalin!'); };
+    
+    // Upload Image
+    document.getElementById('uploadBtn').onclick = () => document.getElementById('uploadModal').style.display = 'flex';
+    document.getElementById('uploadArea').onclick = () => document.getElementById('fileInput').click();
+    document.getElementById('fileInput').onchange = (e) => { let file = e.target.files[0]; if (file) { let reader = new FileReader(); reader.onload = (ev) => { selectedImage = ev.target.result.split(',')[1]; document.getElementById('imagePreview').innerHTML = `<img src="${ev.target.result}" class="image-preview">`; }; reader.readAsDataURL(file); } };
+    document.getElementById('processImageBtn').onclick = () => sendMessage();
+    
+    // UI
+    let typingDiv = null;
+    function showTyping() { typingDiv = document.createElement('div'); typingDiv.className = 'typing'; typingDiv.innerHTML = '<span></span><span></span><span></span>'; messagesDiv.appendChild(typingDiv); scrollToBottom(); }
+    function removeTyping() { if (typingDiv) typingDiv.remove(); }
+    
+    // Folders
+    function renderFolders() { let container = document.getElementById('foldersContainer'); container.innerHTML = '<button class="folder-btn active" data-folder="all">Semua</button><button class="folder-btn" data-folder="work">Work</button><button class="folder-btn" data-folder="personal">Personal</button>'; document.querySelectorAll('.folder-btn').forEach(btn => btn.onclick = () => { document.querySelectorAll('.folder-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderChatsList(); }); }
+    
+    // Quick Reply
+    let quickReplies = ['Terima kasih!', 'Bisa jelaskan lebih detail?', 'Tolong ringkas.', 'Contoh?', 'Lanjutkan.', 'Saya setuju.'];
+    function renderQuickGrid() { let grid = document.getElementById('quickGrid'); if(!grid) return; grid.innerHTML = ''; quickReplies.forEach(q => { let btn = document.createElement('div'); btn.className = 'quick-btn'; btn.innerText = q; btn.onclick = () => { messageInput.value = q; sendMessage(); closeModal('settingsModal'); }; grid.appendChild(btn); }); }
+    
+    // Reminders
+    function renderReminders() { let container = document.getElementById('reminderList'); if(!container) return; container.innerHTML = ''; reminders.forEach((r, i) => { container.innerHTML += `<div class="reminder-item"><span>🔔 ${escapeHtml(r.text)}</span><button onclick="deleteReminder(${i})" style="background:none;border:none;color:#ef4444;cursor:pointer;">Hapus</button></div>`; }); }
+    function deleteReminder(i) { reminders.splice(i,1); localStorage.setItem('cyama_reminders', JSON.stringify(reminders)); renderReminders(); }
+    document.getElementById('addReminderBtn')?.addEventListener('click', () => { let text = document.getElementById('reminderText')?.value; if(text) { reminders.push({ text, time: Date.now() }); localStorage.setItem('cyama_reminders', JSON.stringify(reminders)); renderReminders(); document.getElementById('reminderText').value = ''; } });
+    
+    // Stats
+    function renderStats() { let totalChats = Object.keys(chats).length; let totalMessages = Object.values(chats).reduce((sum,c) => sum + c.messages.length, 0); document.getElementById('statsContainer').innerHTML = `<div class="stat-card"><div class="stat-number">${totalChats}</div><div>Chat</div></div><div class="stat-card"><div class="stat-number">${totalMessages}</div><div>Pesan</div></div><div class="stat-card"><div class="stat-number">${streak}</div><div>Streak</div></div><div class="stat-card"><div class="stat-number">${reminders.length}</div><div>Reminder</div></div>`; }
+    
+    // Share & Export
+    document.getElementById('shareChatBtn')?.addEventListener('click', () => { let text = encodeURIComponent(`Chat dari cYama AI: ${chats[currentChatId]?.title || ''}`); window.open(`https://wa.me/?text=${text}`, '_blank'); });
+    document.getElementById('exportChatBtn')?.addEventListener('click', () => { let chat = chats[currentChatId]; if(!chat) return; let content = `cYama AI Export\n${new Date().toLocaleString()}\n\n` + chat.messages.map(m => `${m.role === 'user' ? 'User' : 'cYama AI'} (${m.time}):\n${m.content}\n`).join('\n'); let blob = new Blob([content], {type:'text/plain'}); let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `chat_${currentChatId}.txt`; a.click(); });
+    document.getElementById('clearAllBtn')?.addEventListener('click', () => { if(confirm('Hapus SEMUA chat? Tidak bisa dibatalkan!')) { chats = {}; saveChats(); createNewChat(); renderChatsList(); } });
+    document.getElementById('statsBtn')?.addEventListener('click', () => { renderStats(); document.getElementById('settingsModal').style.display = 'flex'; });
+    
+    // Settings & Dark Mode
+    document.getElementById('settingsBtn').onclick = () => { renderQuickGrid(); renderReminders(); renderStats(); document.getElementById('settingsModal').style.display = 'flex'; };
+    document.getElementById('darkModeToggle').onchange = (e) => { if(e.target.checked) document.body.classList.add('dark'); else document.body.classList.remove('dark'); };
+    document.getElementById('bgColor').onchange = (e) => document.body.style.background = e.target.value;
+    document.getElementById('personality').onchange = (e) => localStorage.setItem('cyama_personality', e.target.value);
+    document.getElementById('incognitoToggle').onchange = (e) => incognito = e.target.checked;
+    document.getElementById('folderSelect').onchange = () => renderChatsList();
+    document.getElementById('moreBtn').onclick = () => document.getElementById('moreModal').style.display = 'flex';
+    
+    // Search
+    document.getElementById('searchInput').oninput = () => renderChatsList();
+    
+    // Initial Load
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    window.closeModal = closeModal;
+    
+    document.getElementById('menuBtn').onclick = () => document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('newChatBtn').onclick = createNewChat;
+    sendBtn.onclick = sendMessage;
+    messageInput.onkeypress = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+    messageInput.oninput = function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 100) + 'px'; };
+    
+    // Footer
+    document.getElementById('sidebarFooter').innerHTML = isGuest ? `<div class="user-avatar"><i class="fas fa-user"></i></div><div class="user-name">Tamu</div><button class="logout-btn" onclick="localStorage.clear();location.reload()"><i class="fas fa-sign-out-alt"></i></button>` : `<img src="${user.picture || ''}" class="user-avatar" style="object-fit:cover;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="user-avatar" style="display:none"><i class="fas fa-user"></i></div><div class="user-name">${escapeHtml(user.name || 'User')}</div><button class="logout-btn" onclick="localStorage.clear();location.reload()"><i class="fas fa-sign-out-alt"></i></button>`;
+    
+    renderFolders(); loadChats(); messageInput.focus();
+</script>
 </body>
 </html>
