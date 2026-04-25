@@ -1,5 +1,12 @@
 {
   "name": "cyama-ai",
-  "version": "1.0.0",
-  "type": "module"
+  "version": "3.0.0",
+  "description": "cYama AI - Super AI dengan 25+ Fitur",
+  "type": "module",
+  "dependencies": {
+    "formidable": "^3.5.1"
+  },
+  "scripts": {
+    "dev": "node api/chat.js"
+  }
 }
