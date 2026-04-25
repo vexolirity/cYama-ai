@@ -9,57 +9,34 @@ export default async function handler(req, res) {
     }
     
     try {
-        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({
-                code,
-                client_id: CLIENT_ID,
-                client_secret: CLIENT_SECRET,
-                redirect_uri: REDIRECT_URI,
-                grant_type: 'authorization_code'
+                code, client_id: CLIENT_ID, client_secret: CLIENT_SECRET,
+                redirect_uri: REDIRECT_URI, grant_type: 'authorization_code'
             })
         });
         
-        const tokenData = await tokenResponse.json();
-        
-        if (!tokenData.access_token) {
-            throw new Error('Gagal mendapatkan access token');
-        }
-        
-        const userResponse = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-            headers: { Authorization: `Bearer ${tokenData.access_token}` }
+        const token = await tokenRes.json();
+        const userRes = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: { Authorization: `Bearer ${token.access_token}` }
         });
-        
-        const userData = await userResponse.json();
-        
-        const html = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Login Berhasil</title>
-                <script>
-                    localStorage.setItem('cyama_user', JSON.stringify({
-                        name: '${userData.name.replace(/'/g, "\\'")}',
-                        email: '${userData.email}',
-                        picture: '${userData.picture}',
-                        id: '${userData.id}'
-                    }));
-                    localStorage.setItem('cyama_auth', 'true');
-                    window.location.href = '/';
-                </script>
-            </head>
-            <body style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;background:#0f0c29;color:white;">
-                <div>Redirecting...</div>
-            </body>
-            </html>
-        `;
+        const user = await userRes.json();
         
         res.setHeader('Content-Type', 'text/html');
-        res.status(200).send(html);
-        
-    } catch (error) {
-        console.error('Auth error:', error);
+        res.status(200).send(`
+            <script>
+                localStorage.setItem('cyama_user', JSON.stringify({
+                    name: '${user.name.replace(/'/g, "\\'")}',
+                    email: '${user.email}',
+                    picture: '${user.picture}'
+                }));
+                localStorage.setItem('cyama_auth', 'true');
+                location.href = '/dashboard.html';
+            </script>
+        `);
+    } catch (err) {
         res.redirect('/?error=Login%20Gagal');
     }
 }
