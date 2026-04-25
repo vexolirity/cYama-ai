@@ -46,11 +46,11 @@ export default async function handler(req, res) {
                         id: '${userData.id}'
                     }));
                     localStorage.setItem('cyama_auth', 'true');
-                    window.location.href = '/dashboard.html';
+                    window.location.href = '/';
                 </script>
             </head>
             <body style="display:flex;justify-content:center;align-items:center;height:100vh;font-family:sans-serif;background:#0f0c29;color:white;">
-                <div>Redirecting to dashboard...</div>
+                <div>Redirecting...</div>
             </body>
             </html>
         `;
