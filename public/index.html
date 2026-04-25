@@ -2,229 +2,74 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>cYama AI - Super AI</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>cYama AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
             align-items: center;
-            overflow-x: hidden;
+            justify-content: center;
+            padding: 20px;
         }
-
-        /* Animated Background */
-        .animated-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-        }
-
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.5;
-            animation: float 20s infinite ease;
-        }
-
-        .orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #8b5cf6, #4c1d95); top: -150px; left: -150px; }
-        .orb-2 { width: 600px; height: 600px; background: radial-gradient(circle, #ec4899, #be185d); bottom: -200px; right: -200px; animation-delay: -5s; }
-        .orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, #06b6d4, #0891b2); top: 50%; left: 50%; animation-delay: -10s; }
-
-        @keyframes float {
-            0%,100% { transform: translate(0,0) scale(1); }
-            33% { transform: translate(30px,-30px) scale(1.1); }
-            66% { transform: translate(-20px,20px) scale(0.9); }
-        }
-
-        .particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .particle {
-            position: absolute;
-            background: rgba(255,255,255,0.3);
-            border-radius: 50%;
-            animation: particleFloat 15s infinite linear;
-        }
-
-        @keyframes particleFloat {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
-        }
-
-        .login-container {
-            position: relative;
-            z-index: 2;
-            background: rgba(255,255,255,0.1);
+        .card {
+            background: rgba(255,255,255,0.08);
             backdrop-filter: blur(20px);
-            border-radius: 30px;
-            padding: 50px;
+            border-radius: 32px;
+            padding: 40px 24px;
+            width: 100%;
+            max-width: 360px;
             text-align: center;
-            max-width: 450px;
-            width: 90%;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.1);
         }
-
-        .logo {
-            font-size: 80px;
-            margin-bottom: 20px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%,100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        h1 {
-            color: white;
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        p {
-            color: rgba(255,255,255,0.7);
-            margin-bottom: 30px;
-        }
-
+        .logo { font-size: 64px; margin-bottom: 16px; }
+        h1 { color: white; font-size: 28px; margin-bottom: 8px; }
+        .sub { color: rgba(255,255,255,0.6); font-size: 14px; margin-bottom: 32px; }
         .google-btn {
-            background: white;
-            color: #333;
-            border: none;
-            padding: 15px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            transition: all 0.3s;
+            background: white; color: #1a1a2e; border: none;
+            width: 100%; padding: 14px; border-radius: 60px;
+            font-size: 16px; font-weight: 600;
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; cursor: pointer; margin-bottom: 12px;
         }
-
-        .google-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-
         .guest-btn {
-            background: rgba(255,255,255,0.2);
-            color: white;
-            border: 1px solid rgba(255,255,255,0.3);
-            padding: 12px;
-            border-radius: 50px;
-            font-size: 14px;
-            cursor: pointer;
-            margin-top: 15px;
-            width: 100%;
+            background: rgba(255,255,255,0.1); color: white;
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 100%; padding: 14px; border-radius: 60px;
+            font-size: 14px; cursor: pointer;
         }
-
-        .guest-btn:hover {
-            background: rgba(255,255,255,0.3);
-        }
-
-        .features {
-            margin-top: 30px;
-            text-align: left;
-            color: rgba(255,255,255,0.6);
-            font-size: 12px;
-        }
-
-        .features li {
-            margin: 8px 0;
-            list-style: none;
-        }
+        .features { margin-top: 32px; text-align: left; color: rgba(255,255,255,0.5); font-size: 12px; }
+        .features li { margin: 8px 0; list-style: none; display: flex; align-items: center; gap: 8px; }
+        .features i { width: 20px; font-size: 12px; color: #8b5cf6; }
     </style>
 </head>
 <body>
-    <div class="animated-bg">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-    </div>
-    <div class="particles" id="particles"></div>
-
-    <div class="login-container">
-        <div class="logo">
-            <i class="fas fa-brain"></i>
-        </div>
+    <div class="card">
+        <div class="logo"><i class="fas fa-brain"></i></div>
         <h1>cYama AI</h1>
-        <p>Super AI dengan 25+ Fitur Canggih</p>
-        
-        <button class="google-btn" onclick="location.href='/api/auth/google'">
-            <i class="fab fa-google"></i> Login dengan Google
-        </button>
-        
-        <button class="guest-btn" onclick="guestLogin()">
-            Lanjut sebagai Tamu (Fitur Terbatas)
-        </button>
-        
+        <div class="sub">Asisten cerdas berbasis GPT-4</div>
+        <button class="google-btn" onclick="location.href='/api/auth/google'"><i class="fab fa-google"></i> Login dengan Google</button>
+        <button class="guest-btn" onclick="guestLogin()">Lanjut sebagai Tamu</button>
         <div class="features">
-            <li>✅ Multi Chat & History</li>
-            <li>✅ Search Chat, Copy Pesan, Pin Chat</li>
-            <li>✅ Dark Mode, Custom Background, Font Size</li>
-            <li>✅ Voice Input, Text-to-Speech</li>
-            <li>✅ Upload Gambar + AI Vision</li>
-            <li>✅ Custom AI Personality</li>
-            <li>✅ Bagikan Chat, Screenshot, Export</li>
-            <li>✅ To-Do List, Calculator, Streak & Badge</li>
-            <li>✅ Incognito Mode, PIN Lock, Auto Delete</li>
-            <li>✅ Admin Dashboard (untuk owner)</li>
+            <li><i class="fas fa-check-circle"></i> Chat GPT-4 + Vision (lihat gambar)</li>
+            <li><i class="fas fa-check-circle"></i> Multi chat, folder, pin, search</li>
+            <li><i class="fas fa-check-circle"></i> Voice input + AI bisa bicara</li>
+            <li><i class="fas fa-check-circle"></i> Reminder, incognito, export chat</li>
+            <li><i class="fas fa-check-circle"></i> Dark/light mode ikuti HP</li>
         </div>
     </div>
-
     <script>
-        function createParticles() {
-            const container = document.getElementById('particles');
-            for(let i = 0; i < 50; i++) {
-                const p = document.createElement('div');
-                p.classList.add('particle');
-                p.style.width = Math.random() * 4 + 1 + 'px';
-                p.style.height = p.style.width;
-                p.style.left = Math.random() * 100 + '%';
-                p.style.animationDelay = Math.random() * 15 + 's';
-                p.style.animationDuration = Math.random() * 10 + 8 + 's';
-                container.appendChild(p);
-            }
-        }
-        createParticles();
-
         function guestLogin() {
             localStorage.setItem('cyama_auth', 'guest');
-            localStorage.setItem('cyama_user', JSON.stringify({ name: 'Tamu', isGuest: true }));
-            window.location.href = '/dashboard.html';
+            localStorage.setItem('cyama_user', JSON.stringify({ name: 'Tamu' }));
+            location.href = '/dashboard.html';
         }
-
-        if (localStorage.getItem('cyama_auth') === 'true') {
-            window.location.href = '/dashboard.html';
-        }
+        if (localStorage.getItem('cyama_auth') === 'true') location.href = '/dashboard.html';
     </script>
 </body>
 </html>
