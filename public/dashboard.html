@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-    <title>cYama AI - Chat</title>
+    <title>cYama AI - Premium Chat</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -15,14 +15,14 @@
         }
         
         :root {
-            --bg-primary: linear-gradient(145deg, #0f0c29 0%, #1a1a3e 50%, #24243e 100%);
-            --bg-sidebar: rgba(10, 10, 20, 0.95);
-            --card-bg: rgba(255,255,255,0.05);
+            --bg-primary: #0a0a1a;
+            --bg-secondary: #0f0f1f;
+            --sidebar-bg: rgba(10, 10, 26, 0.95);
             --bubble-user: linear-gradient(135deg, #8b5cf6, #6d28d9);
-            --bubble-bot: rgba(255,255,255,0.08);
+            --bubble-bot: rgba(255,255,255,0.06);
             --text-primary: #ffffff;
             --text-secondary: rgba(255,255,255,0.6);
-            --border-color: rgba(255,255,255,0.08);
+            --border-color: rgba(139,92,246,0.2);
             --accent: #8b5cf6;
         }
         
@@ -38,14 +38,50 @@
             left: 0;
         }
         
-        body.dark {
-            --bg-primary: #0a0a0a;
-            --bg-sidebar: #0a0a0a;
-            --bubble-bot: #1a1a1a;
+        /* LOADING SCREEN - FIX LAYAR PUTIH */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, #0a0a1a, #12122a);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 24px;
+            transition: opacity 0.5s ease, visibility 0.5s;
         }
         
-        /* Animated Background */
-        .bg-animation {
+        .loading-screen.hide {
+            opacity: 0;
+            visibility: hidden;
+        }
+        
+        .loader {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(139,92,246,0.2);
+            border-top: 3px solid #8b5cf6;
+            border-radius: 50%;
+            animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 14px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+        }
+        
+        /* Animated background */
+        .animated-bg {
             position: fixed;
             top: 0;
             left: 0;
@@ -55,23 +91,20 @@
             pointer-events: none;
         }
         
-        .glow {
+        .orb {
             position: absolute;
-            width: 500px;
-            height: 500px;
             border-radius: 50%;
-            filter: blur(120px);
-            animation: floatBg 20s infinite ease-in-out;
+            filter: blur(100px);
+            animation: orbFloat 25s infinite ease-in-out;
         }
         
-        .glow-1 { background: #8b5cf6; top: -200px; left: -200px; }
-        .glow-2 { background: #ec4899; bottom: -200px; right: -200px; animation-delay: -7s; }
-        .glow-3 { background: #06b6d4; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 300px; height: 300px; animation-delay: -14s; }
+        .orb-1 { width: 400px; height: 400px; background: #8b5cf6; top: -150px; left: -150px; opacity: 0.3; }
+        .orb-2 { width: 350px; height: 350px; background: #ec4899; bottom: -100px; right: -100px; opacity: 0.25; animation-delay: -8s; }
         
-        @keyframes floatBg {
-            0%,100% { transform: translate(0,0) scale(1); opacity: 0.3; }
-            33% { transform: translate(50px,-50px) scale(1.2); opacity: 0.5; }
-            66% { transform: translate(-40px,40px) scale(0.8); opacity: 0.2; }
+        @keyframes orbFloat {
+            0%,100% { transform: translate(0,0) scale(1); }
+            33% { transform: translate(40px,-40px) scale(1.1); }
+            66% { transform: translate(-30px,30px) scale(0.9); }
         }
         
         .app {
@@ -80,16 +113,22 @@
             display: flex;
             height: 100%;
             width: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
         
-        /* ========== SIDEBAR ========== */
+        .app.visible {
+            opacity: 1;
+        }
+        
+        /* SIDEBAR */
         .sidebar {
             position: fixed;
             top: 0;
             left: -320px;
             width: 320px;
             height: 100%;
-            background: var(--bg-sidebar);
+            background: var(--sidebar-bg);
             backdrop-filter: blur(30px);
             z-index: 200;
             transition: left 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
@@ -100,14 +139,14 @@
         
         .sidebar.open { left: 0; }
         
-        /* OVERLAY - buat nutup sidebar kalau klik di luar */
         .sidebar-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             z-index: 150;
             display: none;
             opacity: 0;
@@ -119,149 +158,7 @@
             opacity: 1;
         }
         
-        .sidebar-header {
-            padding: 24px 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-        
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: linear-gradient(135deg, #ffd89b, #c7e9fb);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .logo-icon i { font-size: 28px; color: #4c1d95; }
-        
-        .logo-text h2 { font-size: 20px; font-weight: 700; }
-        .logo-text p { font-size: 11px; color: var(--text-secondary); }
-        
-        .new-chat-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
-            border: none;
-            border-radius: 40px;
-            color: white;
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .new-chat-btn:active { transform: scale(0.98); }
-        
-        .search-container {
-            padding: 12px 16px;
-            margin: 12px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 40px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border: 1px solid var(--border-color);
-        }
-        
-        .search-container input {
-            background: none;
-            border: none;
-            color: white;
-            width: 100%;
-            outline: none;
-            font-size: 14px;
-        }
-        
-        .folders {
-            padding: 0 16px;
-            margin-bottom: 16px;
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-        }
-        
-        .folder-btn {
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-color);
-            border-radius: 30px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        
-        .folder-btn.active {
-            background: #8b5cf6;
-            color: white;
-        }
-        
-        .chats-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 0 12px;
-        }
-        
-        .chat-item {
-            padding: 14px 12px;
-            margin: 4px 0;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .chat-item:active { background: rgba(139,92,246,0.3); }
-        .chat-item.active { background: rgba(139,92,246,0.3); }
-        
-        .chat-avatar {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #8b5cf6, #4c1d95);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .chat-info { flex: 1; }
-        .chat-title { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
-        .chat-preview { font-size: 11px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        
-        .sidebar-footer {
-            padding: 20px;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .user-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8b5cf6, #4c1d95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* ========== MAIN CHAT ========== */
+        /* MAIN CHAT */
         .main-chat {
             flex: 1;
             display: flex;
@@ -272,7 +169,7 @@
         
         .chat-header {
             padding: 16px 20px;
-            background: rgba(0,0,0,0.3);
+            background: rgba(10,10,26,0.7);
             backdrop-filter: blur(20px);
             display: flex;
             align-items: center;
@@ -282,41 +179,26 @@
         }
         
         .menu-btn {
-            background: none;
-            border: none;
+            background: rgba(139,92,246,0.15);
+            border: 1px solid var(--border-color);
             color: white;
-            font-size: 24px;
+            font-size: 22px;
             cursor: pointer;
             width: 44px;
             height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             border-radius: 50%;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
         
-        .menu-btn:active { background: rgba(255,255,255,0.2); }
+        .menu-btn:active { background: rgba(139,92,246,0.4); transform: scale(0.95); }
         
         .chat-title-header {
             flex: 1;
             font-weight: 600;
-            font-size: 16px;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .icon-btn {
-            background: rgba(255,255,255,0.08);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
+            font-size: 18px;
+            background: linear-gradient(135deg, #fff, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
         
         .messages {
@@ -332,14 +214,19 @@
             display: flex;
             gap: 12px;
             max-width: 85%;
-            animation: messageIn 0.3s ease;
+            animation: fadeSlideUp 0.3s ease;
+        }
+        
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .message.user { align-self: flex-end; flex-direction: row-reverse; }
         
         .message-avatar {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             background: linear-gradient(135deg, #8b5cf6, #4c1d95);
             display: flex;
@@ -362,42 +249,16 @@
         }
         
         .message.bot .message-bubble {
-            background: var(--bubble-bot);
+            background: rgba(255,255,255,0.06);
             border-bottom-left-radius: 6px;
-        }
-        
-        @keyframes messageIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Typing Indicator */
-        .typing {
-            display: flex;
-            gap: 6px;
-            padding: 12px 18px;
-            background: var(--bubble-bot);
-            border-radius: 24px;
-            width: fit-content;
-        }
-        
-        .typing span {
-            width: 8px;
-            height: 8px;
-            background: white;
-            border-radius: 50%;
-            animation: typingAnim 1.4s infinite;
-        }
-        
-        @keyframes typingAnim {
-            0%,60%,100% { transform: translateY(0); opacity: 0.5; }
-            30% { transform: translateY(-10px); opacity: 1; }
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139,92,246,0.2);
         }
         
         /* INPUT AREA */
         .input-area {
-            padding: 12px 16px;
-            background: rgba(0,0,0,0.4);
+            padding: 12px 16px 20px;
+            background: rgba(10,10,26,0.7);
             backdrop-filter: blur(20px);
             border-top: 1px solid var(--border-color);
             flex-shrink: 0;
@@ -407,11 +268,6 @@
             display: flex;
             gap: 12px;
             align-items: flex-end;
-        }
-        
-        .input-actions {
-            display: flex;
-            gap: 8px;
         }
         
         .input-btn, .send-btn {
@@ -425,7 +281,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s;
         }
+        
+        .input-btn:active, .send-btn:active { transform: scale(0.95); }
         
         .send-btn {
             background: linear-gradient(135deg, #8b5cf6, #6d28d9);
@@ -434,7 +293,7 @@
         
         .message-input {
             flex: 1;
-            background: rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.06);
             border: 1px solid var(--border-color);
             border-radius: 30px;
             padding: 14px 18px;
@@ -449,6 +308,30 @@
         .message-input:focus {
             outline: none;
             border-color: #8b5cf6;
+            background: rgba(139,92,246,0.1);
+        }
+        
+        .typing {
+            display: flex;
+            gap: 6px;
+            padding: 12px 18px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 24px;
+            width: fit-content;
+            border: 1px solid rgba(139,92,246,0.2);
+        }
+        
+        .typing span {
+            width: 8px;
+            height: 8px;
+            background: #a78bfa;
+            border-radius: 50%;
+            animation: typingAnim 1.4s infinite;
+        }
+        
+        @keyframes typingAnim {
+            0%,60%,100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-10px); opacity: 1; }
         }
         
         /* MODAL */
@@ -459,8 +342,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(12px);
             z-index: 300;
             align-items: center;
             justify-content: center;
@@ -469,13 +352,17 @@
         .modal-content {
             background: rgba(20,20,40,0.98);
             backdrop-filter: blur(20px);
-            border-radius: 32px;
+            border-radius: 40px;
             width: 90%;
             max-width: 420px;
-            max-height: 85vh;
-            overflow-y: auto;
-            padding: 24px;
-            border: 1px solid var(--border-color);
+            padding: 28px;
+            border: 1px solid rgba(139,92,246,0.3);
+            animation: modalPop 0.3s ease;
+        }
+        
+        @keyframes modalPop {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
         
         .modal-header {
@@ -490,31 +377,23 @@
         .modal-close {
             font-size: 28px;
             cursor: pointer;
-        }
-        
-        .setting-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            border-bottom: 1px solid var(--border-color);
+            opacity: 0.7;
         }
         
         .upload-area {
             border: 2px dashed rgba(139,92,246,0.5);
-            border-radius: 24px;
-            padding: 24px;
+            border-radius: 28px;
+            padding: 32px;
             text-align: center;
             cursor: pointer;
+            transition: all 0.2s;
         }
         
-        .image-preview { max-width: 100%; border-radius: 16px; margin-top: 12px; }
+        .upload-area:hover { border-color: #8b5cf6; background: rgba(139,92,246,0.1); }
+        .image-preview { max-width: 100%; border-radius: 20px; margin-top: 16px; }
         
         @media (min-width: 768px) {
-            .sidebar {
-                position: relative;
-                left: 0 !important;
-            }
+            .sidebar { position: relative; left: 0 !important; }
             .menu-btn { display: none; }
             .sidebar-overlay { display: none !important; }
         }
@@ -526,57 +405,61 @@
     </style>
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="glow glow-1"></div>
-        <div class="glow glow-2"></div>
-        <div class="glow glow-3"></div>
+    <!-- LOADING SCREEN - FIX LAYAR PUTIH -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loader"></div>
+        <div class="loading-text">Loading cYama AI...</div>
     </div>
     
-    <div class="app">
-        <!-- OVERLAY: klik di sini untuk tutup sidebar -->
+    <div class="animated-bg">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+    </div>
+    
+    <div class="app" id="app">
         <div class="sidebar-overlay" id="sidebarOverlay"></div>
         
-        <!-- SIDEBAR -->
         <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="logo-area">
-                    <div class="logo-icon"><i class="fas fa-brain"></i></div>
-                    <div class="logo-text"><h2>cYama AI</h2><p>Super Intelligence</p></div>
+            <div class="sidebar-header" style="padding:24px 20px;border-bottom:1px solid var(--border-color);">
+                <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+                    <div style="width:48px;height:48px;background:linear-gradient(135deg,#ffd89b,#c7e9fb);border-radius:20px;display:flex;align-items:center;justify-content:center;">
+                        <i class="fas fa-brain" style="font-size:26px;color:#4c1d95;"></i>
+                    </div>
+                    <div><h2 style="font-size:20px;">cYama AI</h2><p style="font-size:11px;color:var(--text-secondary);">Premium Intelligence</p></div>
                 </div>
-                <button class="new-chat-btn" id="newChatBtn"><i class="fas fa-plus"></i> Obrolan Baru</button>
+                <button class="new-chat-btn" id="newChatBtn" style="width:100%;padding:14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);border:none;border-radius:40px;color:white;font-weight:600;cursor:pointer;"><i class="fas fa-plus"></i> Obrolan Baru</button>
             </div>
             
-            <div class="search-container">
+            <div class="search-container" style="padding:12px 16px;margin:12px;background:rgba(255,255,255,0.05);border-radius:40px;display:flex;gap:10px;">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchInput" placeholder="Cari chat...">
+                <input type="text" id="searchInput" placeholder="Cari chat..." style="background:none;border:none;color:white;width:100%;outline:none;">
             </div>
             
-            <div class="folders" id="foldersContainer">
-                <button class="folder-btn active" data-folder="all">Semua</button>
-                <button class="folder-btn" data-folder="work">💼 Work</button>
-                <button class="folder-btn" data-folder="personal">👤 Personal</button>
-            </div>
+            <div class="chats-list" id="chatsList" style="flex:1;overflow-y:auto;padding:0 12px;"></div>
             
-            <div class="chats-list" id="chatsList"></div>
-            
-            <div class="sidebar-footer" id="sidebarFooter"></div>
+            <div class="sidebar-footer" id="sidebarFooter" style="padding:20px;border-top:1px solid var(--border-color);display:flex;align-items:center;gap:12px;"></div>
         </div>
         
-        <!-- MAIN CHAT - KLIK AREA INI UNTUK TUTUP SIDEBAR -->
         <div class="main-chat" id="mainChatArea">
             <div class="chat-header">
                 <button class="menu-btn" id="menuBtn"><i class="fas fa-bars"></i></button>
                 <div class="chat-title-header" id="chatTitle">cYama AI</div>
                 <div class="header-actions">
-                    <button class="icon-btn" id="settingsBtn"><i class="fas fa-sliders-h"></i></button>
+                    <button class="input-btn" id="settingsBtn" style="width:40px;height:40px;"><i class="fas fa-sliders-h"></i></button>
                 </div>
             </div>
             
-            <div class="messages" id="messages"></div>
+            <div class="messages" id="messages">
+                <div style="text-align:center;padding:60px 20px;">
+                    <div style="font-size:56px;margin-bottom:16px;">🤖</div>
+                    <div style="font-size:20px;font-weight:600;margin-bottom:8px;">Selamat datang di cYama AI</div>
+                    <div style="color:var(--text-secondary);">Asisten cerdas siap membantu Anda</div>
+                </div>
+            </div>
             
             <div class="input-area">
                 <div class="input-wrapper">
-                    <div class="input-actions">
+                    <div class="input-actions" style="display:flex;gap:8px;">
                         <button class="input-btn" id="uploadBtn"><i class="fas fa-image"></i></button>
                         <button class="input-btn" id="voiceBtn"><i class="fas fa-microphone"></i></button>
                     </div>
@@ -590,23 +473,20 @@
     <!-- MODAL SETTINGS -->
     <div class="modal" id="settingsModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <span>⚙️ Pengaturan</span>
-                <span class="modal-close" onclick="closeModal('settingsModal')">&times;</span>
-            </div>
-            <div class="setting-item">
+            <div class="modal-header"><span>⚙️ Pengaturan</span><span class="modal-close" onclick="closeModal('settingsModal')">&times;</span></div>
+            <div class="setting-item" style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-color);">
                 <span>🤖 AI Personality</span>
-                <select id="personalitySelect">
-                    <option value="formal">Formal</option>
-                    <option value="santai">Santai</option>
-                    <option value="lucu">Lucu</option>
+                <select id="personalitySelect" style="background:rgba(255,255,255,0.1);border:1px solid var(--border-color);padding:8px 14px;border-radius:30px;color:white;">
+                    <option value="formal">Formal & Profesional</option>
+                    <option value="santai">Santai & Ramah</option>
+                    <option value="lucu">Lucu & Menghibur</option>
                 </select>
             </div>
-            <div class="setting-item">
+            <div class="setting-item" style="display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border-color);">
                 <span>🌙 Dark Mode</span>
                 <input type="checkbox" id="darkModeToggle">
             </div>
-            <div class="setting-item">
+            <div class="setting-item" style="display:flex;justify-content:space-between;padding:14px 0;">
                 <span>🗑️ Incognito Mode</span>
                 <input type="checkbox" id="incognitoToggle">
             </div>
@@ -616,32 +496,37 @@
     <!-- MODAL UPLOAD -->
     <div class="modal" id="uploadModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <span>📷 Upload Gambar</span>
-                <span class="modal-close" onclick="closeModal('uploadModal')">&times;</span>
-            </div>
+            <div class="modal-header"><span>📷 Upload Gambar</span><span class="modal-close" onclick="closeModal('uploadModal')">&times;</span></div>
             <div class="upload-area" id="uploadArea">
-                <i class="fas fa-cloud-upload-alt" style="font-size:40px;"></i>
+                <i class="fas fa-cloud-upload-alt" style="font-size:48px;margin-bottom:12px;display:block;"></i>
                 <p>Klik untuk pilih gambar</p>
                 <input type="file" id="fileInput" accept="image/*" style="display:none;">
             </div>
             <div id="imagePreview"></div>
-            <textarea id="imageQuestion" placeholder="Tanya tentang gambar ini..." style="width:100%;padding:12px;border-radius:20px;background:rgba(255,255,255,0.1);border:none;color:white;margin:12px 0;"></textarea>
-            <button class="new-chat-btn" id="processImageBtn">Kirim & Deskripsikan</button>
+            <textarea id="imageQuestion" placeholder="Tanya tentang gambar ini... (opsional)" style="width:100%;padding:12px;border-radius:24px;background:rgba(255,255,255,0.08);border:none;color:white;margin:16px 0;"></textarea>
+            <button class="new-chat-btn" id="processImageBtn" style="width:100%;padding:14px;background:linear-gradient(135deg,#8b5cf6,#6d28d9);border:none;border-radius:40px;color:white;font-weight:600;cursor:pointer;">Kirim & Deskripsikan</button>
         </div>
     </div>
     
     <script>
-        // ============ FIX SEMUA ERROR ============
+        // ============ HIDE LOADING SCREEN ============
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                const app = document.getElementById('app');
+                if(loadingScreen) loadingScreen.classList.add('hide');
+                if(app) app.classList.add('visible');
+            }, 500);
+        });
         
-        // Auth check
+        // ============ AUTH CHECK ============
         let auth = localStorage.getItem('cyama_auth');
         let user = JSON.parse(localStorage.getItem('cyama_user') || '{}');
         let isGuest = auth !== 'true';
         
         if (!auth && auth !== 'guest') window.location.href = '/';
         
-        // DOM Elements
+        // ============ DOM ELEMENTS ============
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const menuBtn = document.getElementById('menuBtn');
@@ -652,81 +537,34 @@
         const chatsList = document.getElementById('chatsList');
         const chatTitle = document.getElementById('chatTitle');
         
-        // ========== SIDEBAR CONTROLS ==========
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            if(overlay) overlay.classList.remove('active');
-        }
+        // ============ SIDEBAR CONTROLS ============
+        function closeSidebar() { sidebar.classList.remove('open'); if(overlay) overlay.classList.remove('active'); }
+        function openSidebar() { sidebar.classList.add('open'); if(overlay) overlay.classList.add('active'); }
+        function toggleSidebar() { if(sidebar.classList.contains('open')) closeSidebar(); else openSidebar(); }
         
-        function openSidebar() {
-            sidebar.classList.add('open');
-            if(overlay) overlay.classList.add('active');
-        }
+        if(menuBtn) menuBtn.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
+        if(mainChatArea) mainChatArea.addEventListener('click', () => { if(sidebar.classList.contains('open')) closeSidebar(); });
+        if(overlay) overlay.addEventListener('click', closeSidebar);
         
-        function toggleSidebar() {
-            if (sidebar.classList.contains('open')) {
-                closeSidebar();
-            } else {
-                openSidebar();
-            }
-        }
-        
-        // Event: Tombol menu (3 garis)
-        if (menuBtn) {
-            menuBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                toggleSidebar();
-            });
-        }
-        
-        // FIX UTAMA: Klik di area main chat (MANA SAJA) -> tutup sidebar
-        if (mainChatArea) {
-            mainChatArea.addEventListener('click', (e) => {
-                if (sidebar.classList.contains('open')) {
-                    closeSidebar();
-                }
-            });
-        }
-        
-        // Klik overlay juga tutup
-        if (overlay) {
-            overlay.addEventListener('click', closeSidebar);
-        }
-        
-        // ========== CHAT LOGIC ==========
+        // ============ CHAT LOGIC ============
         let currentChatId = null;
         let chats = {};
         let incognito = false;
-        let selectedImage = null;
+        let selectedImageBase64 = null;
         
-        function escapeHtml(text) { 
-            let d = document.createElement('div'); 
-            d.textContent = text; 
-            return d.innerHTML; 
-        }
-        
-        function scrollToBottom() { 
-            messagesDiv.scrollTop = messagesDiv.scrollHeight; 
-        }
-        
-        function closeModal(id) { 
-            document.getElementById(id).style.display = 'none'; 
-        }
+        function escapeHtml(text) { let d = document.createElement('div'); d.textContent = text; return d.innerHTML; }
+        function scrollToBottom() { messagesDiv.scrollTop = messagesDiv.scrollHeight; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
         window.closeModal = closeModal;
         
-        function storageKey() { 
-            return isGuest ? 'cyama_chats_guest' : `cyama_chats_${user.email || 'user'}`; 
-        }
-        
-        function saveChats() { 
-            localStorage.setItem(storageKey(), JSON.stringify(chats)); 
-        }
+        function storageKey() { return isGuest ? 'cyama_chats_guest' : `cyama_chats_${user.email || 'user'}`; }
+        function saveChats() { localStorage.setItem(storageKey(), JSON.stringify(chats)); }
         
         function loadChats() {
             let stored = localStorage.getItem(storageKey());
-            if (stored) chats = JSON.parse(stored);
+            if(stored) chats = JSON.parse(stored);
             else chats = {};
-            if (Object.keys(chats).length === 0) createNewChat();
+            if(Object.keys(chats).length === 0) createNewChat();
             else selectChat(Object.keys(chats)[0]);
             renderChatsList();
         }
@@ -759,32 +597,25 @@
                 renderMessages(chat.messages);
                 renderChatsList();
             }
-            closeSidebar(); // FIX: otomatis tutup sidebar saat pilih chat
+            closeSidebar();
         }
         
         function renderChatsList() {
             if(!chatsList) return;
             chatsList.innerHTML = '';
             let search = document.getElementById('searchInput')?.value.toLowerCase() || '';
-            let folder = document.querySelector('.folder-btn.active')?.dataset.folder || 'all';
-            
-            let filtered = Object.values(chats).filter(c => 
-                (folder === 'all' || c.folder === folder) && 
-                c.title.toLowerCase().includes(search)
-            );
+            let filtered = Object.values(chats).filter(c => c.title.toLowerCase().includes(search));
             filtered.sort((a,b) => b.created - a.created);
             
             filtered.forEach(c => {
                 let div = document.createElement('div');
                 div.className = `chat-item ${currentChatId === c.id ? 'active' : ''}`;
-                let preview = c.messages.length > 0 ? c.messages[c.messages.length-1].content.substring(0, 30) : 'Belum ada pesan';
+                div.style.cssText = 'padding:14px 12px;margin:4px 0;border-radius:16px;display:flex;align-items:center;gap:12px;cursor:pointer;background:' + (currentChatId === c.id ? 'rgba(139,92,246,0.3)' : 'transparent');
+                let preview = c.messages.length > 0 ? c.messages[c.messages.length-1].content.substring(0, 35) : 'Belum ada pesan';
                 div.innerHTML = `
-                    <div class="chat-avatar"><i class="fas fa-comment"></i></div>
-                    <div class="chat-info">
-                        <div class="chat-title">${escapeHtml(c.title)}</div>
-                        <div class="chat-preview">${escapeHtml(preview)}</div>
-                    </div>
-                    <button class="chat-action" onclick="deleteChat('${c.id}', event)" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:6px;"><i class="fas fa-trash"></i></button>
+                    <div style="width:44px;height:44px;background:linear-gradient(135deg,#8b5cf6,#4c1d95);border-radius:14px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-comment"></i></div>
+                    <div style="flex:1;"><div style="font-size:14px;font-weight:500;">${escapeHtml(c.title)}</div><div style="font-size:11px;color:var(--text-secondary);">${escapeHtml(preview)}</div></div>
+                    <button onclick="deleteChat('${c.id}', event)" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:6px;"><i class="fas fa-trash"></i></button>
                 `;
                 div.onclick = () => selectChat(c.id);
                 chatsList.appendChild(div);
@@ -794,7 +625,7 @@
         function renderMessages(messages) {
             messagesDiv.innerHTML = '';
             if(!messages || messages.length === 0) {
-                messagesDiv.innerHTML = `<div style="text-align:center;padding:40px;">🤖 Halo! Saya cYama AI. Ada yang bisa saya bantu?</div>`;
+                messagesDiv.innerHTML = `<div style="text-align:center;padding:60px 20px;"><div style="font-size:56px;margin-bottom:16px;">🤖</div><div style="font-size:20px;font-weight:600;">Halo!</div><div style="color:var(--text-secondary);">Saya cYama AI. Ada yang bisa saya bantu?</div></div>`;
                 return;
             }
             messages.forEach((msg) => {
@@ -802,9 +633,7 @@
                 div.className = `message ${msg.role}`;
                 div.innerHTML = `
                     <div class="message-avatar"><i class="fas ${msg.role === 'user' ? 'fa-user' : 'fa-robot'}"></i></div>
-                    <div class="message-content">
-                        <div class="message-bubble">${escapeHtml(msg.content)}</div>
-                    </div>
+                    <div class="message-content"><div class="message-bubble">${escapeHtml(msg.content)}</div></div>
                 `;
                 messagesDiv.appendChild(div);
             });
@@ -822,8 +651,7 @@
             }
             let chat = chats[currentChatId];
             if(!chat) return;
-            let msg = { role, content };
-            chat.messages.push(msg);
+            chat.messages.push({ role, content });
             if(role === 'user' && chat.messages.length === 1) {
                 chat.title = content.substring(0, 25);
                 chatTitle.innerText = chat.title;
@@ -832,19 +660,32 @@
             renderMessages(chat.messages);
         }
         
+        // ============ FIXED API CALL ============
         async function sendToAI(message, imageBase64 = null) {
             let personality = localStorage.getItem('cyama_personality') || 'formal';
             try {
                 let body = { message, personality };
                 if(imageBase64) body.image = imageBase64;
-                let res = await fetch('/api/chat', { 
+                
+                const res = await fetch('/api/chat', { 
                     method: 'POST', 
                     headers: { 'Content-Type': 'application/json' }, 
                     body: JSON.stringify(body) 
                 });
-                let data = await res.json();
-                return data.success ? data.reply : `⚠️ ${data.error || 'Error'}`;
+                
+                // FIX: Cek response type
+                const text = await res.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch(e) {
+                    console.error('Response bukan JSON:', text.substring(0, 200));
+                    return `⚠️ Server error: ${text.substring(0, 100)}`;
+                }
+                
+                return data.success ? data.reply : `⚠️ ${data.error || 'Terjadi kesalahan'}`;
             } catch(e) { 
+                console.error('API error:', e);
                 return `⚠️ ${e.message}`; 
             }
         }
@@ -857,23 +698,21 @@
             messagesDiv.appendChild(typingDiv);
             scrollToBottom();
         }
-        
-        function removeTyping() { 
-            if(typingDiv) typingDiv.remove(); 
-        }
+        function removeTyping() { if(typingDiv) typingDiv.remove(); }
         
         async function sendMessage() {
             let msg = messageInput.value.trim();
-            if(!msg && !selectedImage) return;
+            if(!msg && !selectedImageBase64) return;
             messageInput.value = '';
             messageInput.style.height = 'auto';
-            addMessage('user', msg || (selectedImage ? '[Mengirim gambar...]' : ''));
+            addMessage('user', msg || (selectedImageBase64 ? '[Mengirim gambar...]' : ''));
             showTyping();
+            
             let reply;
-            if(selectedImage) {
-                let question = document.getElementById('imageQuestion')?.value || 'Deskripsikan gambar ini dalam bahasa Indonesia';
-                reply = await sendToAI(question, selectedImage);
-                selectedImage = null;
+            if(selectedImageBase64) {
+                let question = document.getElementById('imageQuestion')?.value || 'Deskripsikan gambar ini dalam detail';
+                reply = await sendToAI(question, selectedImageBase64);
+                selectedImageBase64 = null;
                 document.getElementById('imagePreview').innerHTML = '';
                 closeModal('uploadModal');
                 document.getElementById('imageQuestion').value = '';
@@ -884,75 +723,51 @@
             addMessage('bot', reply);
         }
         
-        // Voice Input
+        // Voice
         let recognition = null;
         if('webkitSpeechRecognition' in window) {
             recognition = new webkitSpeechRecognition();
             recognition.lang = 'id-ID';
         }
-        
         document.getElementById('voiceBtn').onclick = () => {
             if(recognition) {
                 recognition.start();
-                recognition.onresult = (e) => { 
-                    messageInput.value = e.results[0][0].transcript; 
-                };
-            } else {
-                alert('Voice tidak support di browser ini');
-            }
+                recognition.onresult = (e) => { messageInput.value = e.results[0][0].transcript; };
+                recognition.onerror = () => alert('Mic tidak tersedia');
+            } else alert('Voice tidak support');
         };
         
-        // Upload Image
-        document.getElementById('uploadBtn').onclick = () => {
-            document.getElementById('uploadModal').style.display = 'flex';
-        };
-        
-        document.getElementById('uploadArea').onclick = () => {
-            document.getElementById('fileInput').click();
-        };
-        
+        // Upload - FIXED tanpa /api/upload, langsung kirim base64 ke /api/chat
+        document.getElementById('uploadBtn').onclick = () => document.getElementById('uploadModal').style.display = 'flex';
+        document.getElementById('uploadArea').onclick = () => document.getElementById('fileInput').click();
         document.getElementById('fileInput').onchange = (e) => {
             let file = e.target.files[0];
             if(file && file.type.startsWith('image/')) {
+                if(file.size > 5 * 1024 * 1024) {
+                    alert('Ukuran gambar maksimal 5MB');
+                    return;
+                }
                 let reader = new FileReader();
                 reader.onload = (ev) => {
-                    selectedImage = ev.target.result.split(',')[1];
+                    selectedImageBase64 = ev.target.result.split(',')[1];
                     document.getElementById('imagePreview').innerHTML = `<img src="${ev.target.result}" class="image-preview">`;
                 };
                 reader.readAsDataURL(file);
             }
         };
-        
         document.getElementById('processImageBtn').onclick = () => sendMessage();
         
         // Settings
-        document.getElementById('settingsBtn').onclick = () => {
-            document.getElementById('settingsModal').style.display = 'flex';
-        };
-        
+        document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
         document.getElementById('darkModeToggle').onchange = (e) => {
-            if(e.target.checked) document.body.classList.add('dark');
-            else document.body.classList.remove('dark');
+            if(e.target.checked) document.body.style.setProperty('--bg-primary', '#000000');
+            else document.body.style.setProperty('--bg-primary', '#0a0a1a');
         };
+        document.getElementById('personalitySelect').onchange = (e) => localStorage.setItem('cyama_personality', e.target.value);
+        document.getElementById('incognitoToggle').onchange = (e) => incognito = e.target.checked;
         
-        document.getElementById('personalitySelect').onchange = (e) => {
-            localStorage.setItem('cyama_personality', e.target.value);
-        };
-        
-        document.getElementById('incognitoToggle').onchange = (e) => {
-            incognito = e.target.checked;
-        };
-        
-        // Search & Folders
+        // Search
         document.getElementById('searchInput').oninput = () => renderChatsList();
-        
-        document.querySelectorAll('.folder-btn').forEach(btn => {
-            btn.onclick = () => {
-                document.querySelectorAll('.folder-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                renderChatsList();
-            };
-        });
         
         // Auto resize textarea
         messageInput.oninput = function() {
@@ -960,28 +775,21 @@
             this.style.height = Math.min(this.scrollHeight, 100) + 'px';
         };
         
-        // Event Listeners
         document.getElementById('newChatBtn').onclick = createNewChat;
         sendBtn.onclick = sendMessage;
-        messageInput.onkeypress = (e) => { 
-            if(e.key === 'Enter' && !e.shiftKey) { 
-                e.preventDefault(); 
-                sendMessage(); 
-            } 
-        };
+        messageInput.onkeypress = (e) => { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
         
         // Footer
         document.getElementById('sidebarFooter').innerHTML = isGuest ? `
-            <div class="user-avatar"><i class="fas fa-user"></i></div>
-            <div class="user-name">Tamu</div>
-            <button class="logout-btn" onclick="localStorage.clear();location.reload()" style="background:none;border:none;color:white;font-size:20px;"><i class="fas fa-sign-out-alt"></i></button>
+            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#4c1d95);display:flex;align-items:center;justify-content:center;"><i class="fas fa-user"></i></div>
+            <div style="flex:1;font-size:14px;font-weight:500;">Tamu</div>
+            <button onclick="localStorage.clear();location.reload()" style="background:none;border:none;color:white;font-size:20px;"><i class="fas fa-sign-out-alt"></i></button>
         ` : `
-            <div class="user-avatar"><i class="fas fa-user"></i></div>
-            <div class="user-name">${escapeHtml(user.name || 'User')}</div>
-            <button class="logout-btn" onclick="localStorage.clear();location.reload()" style="background:none;border:none;color:white;font-size:20px;"><i class="fas fa-sign-out-alt"></i></button>
+            <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#4c1d95);display:flex;align-items:center;justify-content:center;"><i class="fas fa-user"></i></div>
+            <div style="flex:1;font-size:14px;font-weight:500;">${escapeHtml(user.name || 'User')}</div>
+            <button onclick="localStorage.clear();location.reload()" style="background:none;border:none;color:white;font-size:20px;"><i class="fas fa-sign-out-alt"></i></button>
         `;
         
-        // Load everything
         loadChats();
         messageInput.focus();
         
