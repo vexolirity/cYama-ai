@@ -28,9 +28,9 @@ export default async function handler(req, res) {
         res.status(200).send(`
             <script>
                 localStorage.setItem('cyama_user', JSON.stringify({
-                    name: '${user.name.replace(/'/g, "\\'")}',
-                    email: '${user.email}',
-                    picture: '${user.picture}'
+                    name: ${JSON.stringify(user.name)},
+                    email: ${JSON.stringify(user.email)},
+                    picture: ${JSON.stringify(user.picture)}
                 }));
                 localStorage.setItem('cyama_auth', 'true');
                 location.href = '/dashboard.html';
